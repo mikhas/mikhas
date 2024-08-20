@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Overcoming QML's requirement of trivially constructable types — Quite Meticulous Logic</title>
+	<meta name="description" content="Title: Overcoming QML's requirement of trivially constructable types; Date: 2024-08-21; Author: Michael Hasselmann">
+	<meta name="author" content="Michael Hasselmann">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!--[if lt IE 9]>
+		<script src="/theme/html5.js"></script>
+		<![endif]-->
+	<link href="/theme/css/ipython.css" rel="stylesheet">
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="//maxcdn.bootstrapcdn.com/bootswatch/3.2.0/simplex/bootstrap.min.css" rel="stylesheet">
+	<link href="/theme/css/local.css" rel="stylesheet">
+	<link href="/theme/css/pygments.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+	<div class="page-header">
+		<h1><a href="/">Quite Meticulous Logic</a>
+		</h1>
+	</div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+<div class="article" itemscope itemtype="http://schema.org/BlogPosting">
+	<div class="text-center article-header">
+		<h1 itemprop="name headline" class="article-title">Overcoming QML's requirement of trivially constructable types</h1>
+		<span itemprop="author" itemscope itemtype="http://schema.org/Person">
+			<h4 itemprop="name">Michael Hasselmann</h4>
+		</span>
+		<time datetime="2024-08-21T00:00:00+02:00" itemprop="datePublished">Wed 21 August 2024</time>
+	</div>
+	<div>
+		Category:
+		<span itemprop="articleSection">
+			<a href="/category/tips-and-tricks.html" rel="category">Tips and Tricks</a>
+		</span>
+	</div>
+ 
+	<div>
+		Tags:
+		<span itemprop="keywords">
+			<a href="/tag/qml.html" rel="tag">QML</a>
+		</span>
+		<span itemprop="keywords">
+			<a href="/tag/pyside6.html" rel="tag">PySide6</a>
+		</span>
+		<span itemprop="keywords">
+			<a href="/tag/design-pattern.html" rel="tag">Design Pattern</a>
+		</span>
+	</div>
+	<div itemprop="articleBody" class="article-body"><div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>In <a class="reference external" href="multi-phase-construction">How objects are constructed and set up in QML</a>
+we learned that types, or rather QML components, need to be trivially
+constructable. Apart from the implicit <tt class="docutils literal">parent</tt> parameter, it is seemingly
+impossible for us to add more parameters to the hidden constructor. Instead, we
+rely on properties to set up the object's initial state.</p>
+</div>
+</div>
+	<hr>
+</div>
+		</div>
+	</div> 	<!-- <hr> -->
+</div> <!-- /container -->
+<footer class="aw-footer bg-danger">
+	<div class="container"> <!-- footer -->
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<div class="row">
+					<div class="col-md-3">
+						<h4>Navigation</h4>
+						<ul class="list-unstyled my-list-style">
+							<li><a href="">Quite Meticulous Logic</a></li>
+						</ul>
+					</div>
+					<div class="col-md-3">
+						<h4>Author</h4>
+                                                Michael Hasselmann
+					</div>
+					<div class="col-md-3">
+						<h4>Categories</h4>
+						<ul class="list-unstyled my-list-style">
+							<li><a href="/category/starter-kit.html">Starter Kit (2)</a></li>
+							<li><a href="/category/tips-and-tricks.html">Tips and Tricks (1)</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</footer>
+</div>
+</body>
+</html>
