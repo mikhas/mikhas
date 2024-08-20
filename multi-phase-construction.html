@@ -157,10 +157,10 @@ after <tt class="docutils literal">label</tt> has been evaluated once.</p>
 </div>
 <div class="section" id="recursive-construction">
 <h2>Recursive construction</h2>
-<p>It is not guaranteed that all phases of object instantiation run one after
-another. For instance, object <tt class="docutils literal">A</tt> could be created before object <tt class="docutils literal">B</tt>, but
-properties will be evaluated for <tt class="docutils literal">B</tt> before <tt class="docutils literal">A</tt>'s property are checked.
-Therefore, <tt class="docutils literal">B</tt> could reach full initialisation before <tt class="docutils literal">A</tt>.</p>
+<p>It is not guaranteed that all construction phases run one after another. For
+instance, object <tt class="docutils literal">A</tt> could be created before object <tt class="docutils literal">B</tt>, but properties
+will be evaluated for <tt class="docutils literal">B</tt> before <tt class="docutils literal">A</tt>'s property are checked. Therefore,
+<tt class="docutils literal">B</tt> could reach full initialisation before <tt class="docutils literal">A</tt>.</p>
 <p>In the general case, innermost objects will be fully initialised before any
 other object.</p>
 <div class="highlight"><pre><span></span><span class="nx">Ancestor</span> <span class="p">{</span> <span class="c1">// last to be fully initialised</span>

@@ -112,10 +112,10 @@ after &lt;tt class="docutils literal"&gt;label&lt;/tt&gt; has been evaluated onc
 &lt;/div&gt;
 &lt;div class="section" id="recursive-construction"&gt;
 &lt;h2&gt;Recursive construction&lt;/h2&gt;
-&lt;p&gt;It is not guaranteed that all phases of object instantiation run one after
-another. For instance, object &lt;tt class="docutils literal"&gt;A&lt;/tt&gt; could be created before object &lt;tt class="docutils literal"&gt;B&lt;/tt&gt;, but
-properties will be evaluated for &lt;tt class="docutils literal"&gt;B&lt;/tt&gt; before &lt;tt class="docutils literal"&gt;A&lt;/tt&gt;'s property are checked.
-Therefore, &lt;tt class="docutils literal"&gt;B&lt;/tt&gt; could reach full initialisation before &lt;tt class="docutils literal"&gt;A&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;It is not guaranteed that all construction phases run one after another. For
+instance, object &lt;tt class="docutils literal"&gt;A&lt;/tt&gt; could be created before object &lt;tt class="docutils literal"&gt;B&lt;/tt&gt;, but properties
+will be evaluated for &lt;tt class="docutils literal"&gt;B&lt;/tt&gt; before &lt;tt class="docutils literal"&gt;A&lt;/tt&gt;'s property are checked. Therefore,
+&lt;tt class="docutils literal"&gt;B&lt;/tt&gt; could reach full initialisation before &lt;tt class="docutils literal"&gt;A&lt;/tt&gt;.&lt;/p&gt;
 &lt;p&gt;In the general case, innermost objects will be fully initialised before any
 other object.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nx"&gt;Ancestor&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// last to be fully initialised&lt;/span&gt;
