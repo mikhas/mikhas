@@ -14,28 +14,23 @@ API of two mandatory properties. They serve as arguments for new objects.&lt;/p&
 &lt;/pre&gt;
 &lt;p&gt;The name of the new class, or QML component, is derived from the file name. So
 if the file name is &lt;tt class="docutils literal"&gt;Derived.qml&lt;/tt&gt;, the new type will be available under
-&lt;tt class="docutils literal"&gt;Derived&lt;/tt&gt;.&lt;/p&gt;
-&lt;p&gt;In Python, an equivalent version could look like so:&lt;/p&gt;
-&lt;pre class="code python literal-block"&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pathlib&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Path&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;PySide6.QtCore&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="w"&gt;
-
-
-&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;icon_source&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Path&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;QObject&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;        &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_amount&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="w"&gt;
-&lt;/span&gt;        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_icon_source&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;icon_source&lt;/span&gt;
+&lt;tt class="docutils literal"&gt;Derived&lt;/tt&gt;. This behaviour can be controlled in a special module file called
+&lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;We can now instantiate an object from the component:&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="nx"&gt;Derived&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;amount:&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
+    &lt;span class="k"&gt;iconSource:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;other/path/to/icon.png&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;
-&lt;p&gt;We'll get to the ominous &lt;tt class="docutils literal"&gt;parent&lt;/tt&gt; parameter in a moment.&lt;/p&gt;
-&lt;p&gt;If we wanted, we could override QML's filename-to-type mapping in a special
-module file called &lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt;:&lt;/p&gt;
-&lt;pre class="code literal-block"&gt;
-module HowTo.Ctors
-
-Derived 1.0 Derived.qml
-Main 1.0 Main.qml
-&lt;/pre&gt;
+&lt;p&gt;QML object construction could be roughly translated to an imperative language
+like so:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;amount&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
+&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;icon_path&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/path/to/icon.png&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;What's unusual perhaps is that the constructor takes no arguments. Instead
+&lt;tt class="docutils literal"&gt;amount&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;icon_path&lt;/tt&gt; are set on the object after instantiation.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="multi-phase-construction"&gt;
 &lt;h2&gt;Multi-phase construction&lt;/h2&gt;
@@ -44,9 +39,12 @@ Main 1.0 Main.qml
 &lt;p class="last"&gt;How the QML engine internally constructs objects is much more complicated.
 The information presented here serves as a conceptual overview only.&lt;/p&gt;
 &lt;/div&gt;
-&lt;p&gt;In the first phase of construction, the QML engine calls a hidden constructor
-similar to the Python constructor shown above and injects the &lt;tt class="docutils literal"&gt;parent&lt;/tt&gt;
-argument.&lt;/p&gt;
+&lt;p&gt;In the first phase of construction, the QML engine calls a hidden constructor and injects the &lt;tt class="docutils literal"&gt;parent&lt;/tt&gt;
+argument. We can imagine the constructor to be defined like so:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;We now have an instance of our &lt;tt class="docutils literal"&gt;Derived&lt;/tt&gt; component, but the properties that
 we declared as required aren't initialised just yet. The QML engine would
 complain with a fatal error if we tried to use the instance in this state.&lt;/p&gt;
@@ -58,7 +56,8 @@ nesting:&lt;/p&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;In the second phase, the initial state of the new object is set up. This
-happens by evaluating the expressions that are bound to the properties:&lt;/p&gt;
+happens by evaluating the expressions that are bound to the properties, as we
+already saw:&lt;/p&gt;
 &lt;pre class="code qml literal-block"&gt;
 &lt;span class="nx"&gt;Derived&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="k"&gt;amount:&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
@@ -116,18 +115,17 @@ after &lt;tt class="docutils literal"&gt;label&lt;/tt&gt; has been evaluated onc
 instance, object &lt;tt class="docutils literal"&gt;A&lt;/tt&gt; could be created before object &lt;tt class="docutils literal"&gt;B&lt;/tt&gt;, but properties
 will be evaluated for &lt;tt class="docutils literal"&gt;B&lt;/tt&gt; before &lt;tt class="docutils literal"&gt;A&lt;/tt&gt;'s property are checked. Therefore,
 &lt;tt class="docutils literal"&gt;B&lt;/tt&gt; could reach full initialisation before &lt;tt class="docutils literal"&gt;A&lt;/tt&gt;.&lt;/p&gt;
-&lt;p&gt;In the general case, innermost objects will be fully initialised before any
-other object.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nx"&gt;Ancestor&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// last to be fully initialised&lt;/span&gt;
-    &lt;span class="nx"&gt;Parent&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// second to be fully initialiased&lt;/span&gt;
-        &lt;span class="nx"&gt;Child&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt; &lt;span class="c1"&gt;// first to be fully initialised&lt;/span&gt;
+&lt;p&gt;In the general case, innermost objects will be constructed before the other
+objects:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nx"&gt;Ancestor&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// last to be fully constructed&lt;/span&gt;
+    &lt;span class="nx"&gt;Parent&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="c1"&gt;// second to be fully constructed&lt;/span&gt;
+        &lt;span class="nx"&gt;Child&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt; &lt;span class="c1"&gt;// first to be fully construced&lt;/span&gt;
     &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Your outermost object will usually be the &lt;tt class="docutils literal"&gt;ApplicationWindow&lt;/tt&gt;, so it'll be
-constructed last. The recursive construction spans all the QML components over
-as many files as necessary that are ultimately involved in making of the
-&lt;tt class="docutils literal"&gt;ApplicationWindow&lt;/tt&gt;, with each component following the multi-phase
-instantiation process.&lt;/p&gt;
+&lt;p&gt;In a typical QML application with a graphical interface, the outermost object
+would be the &lt;tt class="docutils literal"&gt;ApplicationWindow&lt;/tt&gt;, so it'ill be constructed last. The
+recursive construction spans all components nested within, with each component
+following the multi-phase construction process.&lt;/p&gt;
 &lt;/div&gt;
 </content><category term="Starter Kit"></category><category term="QML"></category></entry></feed>

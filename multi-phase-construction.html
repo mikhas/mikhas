@@ -59,28 +59,23 @@ API of two mandatory properties. They serve as arguments for new objects.</p>
 </pre>
 <p>The name of the new class, or QML component, is derived from the file name. So
 if the file name is <tt class="docutils literal">Derived.qml</tt>, the new type will be available under
-<tt class="docutils literal">Derived</tt>.</p>
-<p>In Python, an equivalent version could look like so:</p>
-<pre class="code python literal-block">
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="w">
-</span><span class="kn">from</span> <span class="nn">PySide6.QtCore</span> <span class="kn">import</span> <span class="n">QObject</span><span class="w">
-
-
-</span><span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span><span class="w">
-</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">icon_source</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span><span class="w">
-</span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span><span class="w">
-</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_amount</span> <span class="o">=</span> <span class="n">amount</span><span class="w">
-</span>        <span class="bp">self</span><span class="o">.</span><span class="n">_icon_source</span> <span class="o">=</span> <span class="n">icon_source</span>
+<tt class="docutils literal">Derived</tt>. This behaviour can be controlled in a special module file called
+<tt class="docutils literal">qmldir</tt>.</p>
+<p>We can now instantiate an object from the component:</p>
+<pre class="code qml literal-block">
+<span class="nx">Derived</span> <span class="p">{</span>
+    <span class="k">amount:</span> <span class="mi">5</span>
+    <span class="k">iconSource:</span> <span class="s2">&quot;other/path/to/icon.png&quot;</span>
+<span class="p">}</span>
 </pre>
-<p>We'll get to the ominous <tt class="docutils literal">parent</tt> parameter in a moment.</p>
-<p>If we wanted, we could override QML's filename-to-type mapping in a special
-module file called <tt class="docutils literal">qmldir</tt>:</p>
-<pre class="code literal-block">
-module HowTo.Ctors
-
-Derived 1.0 Derived.qml
-Main 1.0 Main.qml
-</pre>
+<p>QML object construction could be roughly translated to an imperative language
+like so:</p>
+<div class="highlight"><pre><span></span><span class="n">obj</span> <span class="o">=</span> <span class="n">Derived</span><span class="p">()</span>
+<span class="n">obj</span><span class="o">.</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">obj</span><span class="o">.</span><span class="n">icon_path</span> <span class="o">=</span> <span class="s2">&quot;/path/to/icon.png&quot;</span>
+</pre></div>
+<p>What's unusual perhaps is that the constructor takes no arguments. Instead
+<tt class="docutils literal">amount</tt> and <tt class="docutils literal">icon_path</tt> are set on the object after instantiation.</p>
 </div>
 <div class="section" id="multi-phase-construction">
 <h2>Multi-phase construction</h2>
@@ -89,9 +84,12 @@ Main 1.0 Main.qml
 <p class="last">How the QML engine internally constructs objects is much more complicated.
 The information presented here serves as a conceptual overview only.</p>
 </div>
-<p>In the first phase of construction, the QML engine calls a hidden constructor
-similar to the Python constructor shown above and injects the <tt class="docutils literal">parent</tt>
-argument.</p>
+<p>In the first phase of construction, the QML engine calls a hidden constructor and injects the <tt class="docutils literal">parent</tt>
+argument. We can imagine the constructor to be defined like so:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+</pre></div>
 <p>We now have an instance of our <tt class="docutils literal">Derived</tt> component, but the properties that
 we declared as required aren't initialised just yet. The QML engine would
 complain with a fatal error if we tried to use the instance in this state.</p>
@@ -103,7 +101,8 @@ nesting:</p>
 <span class="p">}</span>
 </pre></div>
 <p>In the second phase, the initial state of the new object is set up. This
-happens by evaluating the expressions that are bound to the properties:</p>
+happens by evaluating the expressions that are bound to the properties, as we
+already saw:</p>
 <pre class="code qml literal-block">
 <span class="nx">Derived</span> <span class="p">{</span>
     <span class="k">amount:</span> <span class="mi">5</span>
@@ -161,19 +160,18 @@ after <tt class="docutils literal">label</tt> has been evaluated once.</p>
 instance, object <tt class="docutils literal">A</tt> could be created before object <tt class="docutils literal">B</tt>, but properties
 will be evaluated for <tt class="docutils literal">B</tt> before <tt class="docutils literal">A</tt>'s property are checked. Therefore,
 <tt class="docutils literal">B</tt> could reach full initialisation before <tt class="docutils literal">A</tt>.</p>
-<p>In the general case, innermost objects will be fully initialised before any
-other object.</p>
-<div class="highlight"><pre><span></span><span class="nx">Ancestor</span> <span class="p">{</span> <span class="c1">// last to be fully initialised</span>
-    <span class="nx">Parent</span> <span class="p">{</span> <span class="c1">// second to be fully initialiased</span>
-        <span class="nx">Child</span> <span class="p">{}</span> <span class="c1">// first to be fully initialised</span>
+<p>In the general case, innermost objects will be constructed before the other
+objects:</p>
+<div class="highlight"><pre><span></span><span class="nx">Ancestor</span> <span class="p">{</span> <span class="c1">// last to be fully constructed</span>
+    <span class="nx">Parent</span> <span class="p">{</span> <span class="c1">// second to be fully constructed</span>
+        <span class="nx">Child</span> <span class="p">{}</span> <span class="c1">// first to be fully construced</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
-<p>Your outermost object will usually be the <tt class="docutils literal">ApplicationWindow</tt>, so it'll be
-constructed last. The recursive construction spans all the QML components over
-as many files as necessary that are ultimately involved in making of the
-<tt class="docutils literal">ApplicationWindow</tt>, with each component following the multi-phase
-instantiation process.</p>
+<p>In a typical QML application with a graphical interface, the outermost object
+would be the <tt class="docutils literal">ApplicationWindow</tt>, so it'ill be constructed last. The
+recursive construction spans all components nested within, with each component
+following the multi-phase construction process.</p>
 </div>
 </div>
 	<hr>
