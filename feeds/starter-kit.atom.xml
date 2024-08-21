@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic - Starter Kit</title><link href="https://mikhas.github.io/blog/" rel="alternate"></link><link href="https://mikhas.github.io/blog/feeds/starter-kit.atom.xml" rel="self"></link><id>https://mikhas.github.io/blog/</id><updated>2024-08-20T00:00:00+02:00</updated><entry><title>How objects are constructed and set up in QML</title><link href="https://mikhas.github.io/blog/multi-phase-construction.html" rel="alternate"></link><published>2024-08-20T00:00:00+02:00</published><updated>2024-08-20T00:00:00+02:00</updated><author><name>Michael Hasselmann</name></author><id>tag:mikhas.github.io,2024-08-20:/blog/multi-phase-construction.html</id><summary type="html">&lt;p class="first last"&gt;A brief introduction to making custom types in QML, and how the multi-phase instantiation works in practice.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic - Starter Kit</title><link href="https://mikhas.github.io/blog/" rel="alternate"></link><link href="https://mikhas.github.io/blog/feeds/starter-kit.atom.xml" rel="self"></link><id>https://mikhas.github.io/blog/</id><updated>2024-08-20T00:00:00+02:00</updated><entry><title>How objects are constructed and set up in QML</title><link href="https://mikhas.github.io/blog/multi-phase-construction.html" rel="alternate"></link><published>2024-08-20T00:00:00+02:00</published><updated>2024-08-20T00:00:00+02:00</updated><author><name>Michael Hasselmann</name></author><id>tag:mikhas.github.io,2024-08-20:/blog/multi-phase-construction.html</id><summary type="html">&lt;p class="first last"&gt;A brief introduction to making custom types in QML, and how the multi-phase object construction works in practice.&lt;/p&gt;
 </summary><content type="html">&lt;div class="section" id="making-a-new-type"&gt;
 &lt;h2&gt;Making a new type&lt;/h2&gt;
 &lt;p&gt;Here's how you derive a new class from a base class in pure QML, with a public
-API of two mandatory properties. They serve as arguments for new objects.&lt;/p&gt;
+API of two mandatory properties. They fill the role of constructor parameters:&lt;/p&gt;
 &lt;pre class="code qml literal-block"&gt;
 &lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;QtQuick&lt;/span&gt;
 
@@ -23,8 +23,7 @@ if the file name is &lt;tt class="docutils literal"&gt;Derived.qml&lt;/tt&gt;, t
     &lt;span class="k"&gt;iconSource:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;other/path/to/icon.png&amp;quot;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;
-&lt;p&gt;QML object construction could be roughly translated to an imperative language
-like so:&lt;/p&gt;
+&lt;p&gt;QML object construction could be roughly translated to Python like so:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
 &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;amount&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
 &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;icon_path&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/path/to/icon.png&amp;quot;&lt;/span&gt;
@@ -83,7 +82,7 @@ doom and we'll be greeted by the infamous binding loop warning:&lt;/p&gt;
 application will either hang or crash.&lt;/p&gt;
 &lt;p&gt;In the third phase, when all bound property expressions have been evaluated
 once, &lt;tt class="docutils literal"&gt;Component.onCompleted&lt;/tt&gt; will be called. This allows us to run code
-after the object has been instantiated but before it'll be used by others.&lt;/p&gt;
+after the object has been constructed but before it'll be used by others.&lt;/p&gt;
 &lt;pre class="code qml literal-block"&gt;
 &lt;span class="nx"&gt;Derived&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="k"&gt;amount:&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;

@@ -48,7 +48,7 @@
 	<div itemprop="articleBody" class="article-body"><div class="section" id="making-a-new-type">
 <h2>Making a new type</h2>
 <p>Here's how you derive a new class from a base class in pure QML, with a public
-API of two mandatory properties. They serve as arguments for new objects.</p>
+API of two mandatory properties. They fill the role of constructor parameters:</p>
 <pre class="code qml literal-block">
 <span class="kr">import</span> <span class="nx">QtQuick</span>
 
@@ -68,8 +68,7 @@ if the file name is <tt class="docutils literal">Derived.qml</tt>, the new type 
     <span class="k">iconSource:</span> <span class="s2">&quot;other/path/to/icon.png&quot;</span>
 <span class="p">}</span>
 </pre>
-<p>QML object construction could be roughly translated to an imperative language
-like so:</p>
+<p>QML object construction could be roughly translated to Python like so:</p>
 <div class="highlight"><pre><span></span><span class="n">obj</span> <span class="o">=</span> <span class="n">Derived</span><span class="p">()</span>
 <span class="n">obj</span><span class="o">.</span><span class="n">amount</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">obj</span><span class="o">.</span><span class="n">icon_path</span> <span class="o">=</span> <span class="s2">&quot;/path/to/icon.png&quot;</span>
@@ -128,7 +127,7 @@ doom and we'll be greeted by the infamous binding loop warning:</p>
 application will either hang or crash.</p>
 <p>In the third phase, when all bound property expressions have been evaluated
 once, <tt class="docutils literal">Component.onCompleted</tt> will be called. This allows us to run code
-after the object has been instantiated but before it'll be used by others.</p>
+after the object has been constructed but before it'll be used by others.</p>
 <pre class="code qml literal-block">
 <span class="nx">Derived</span> <span class="p">{</span>
     <span class="k">amount:</span> <span class="mi">5</span>
