@@ -1,0 +1,18 @@
+pre.code {
+  background-color: #282828;
+}
+
+table {
+  table-layout: auto;
+  border: 0;
+  background-color: none;
+}
+
+table tbody > tr:nth-child(2n+1) > td, td.label, td {
+  background-color: white;
+  border-left: 0;
+}
+
+table colgroup {
+  width: 10px;
+}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic</title><link href="https://mikhas.github.io/blog/" rel="alternate"></link><link href="https://mikhas.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>https://mikhas.github.io/blog/</id><updated>2024-08-20T00:00:00+02:00</updated><entry><title>How objects are constructed and set up in QML</title><link href="https://mikhas.github.io/blog/multi-phase-construction.html" rel="alternate"></link><published>2024-08-20T00:00:00+02:00</published><updated>2024-08-20T00:00:00+02:00</updated><author><name>Michael Hasselmann</name></author><id>tag:mikhas.github.io,2024-08-20:/blog/multi-phase-construction.html</id><summary type="html">&lt;p class="first last"&gt;A brief introduction to making custom types in QML, and how the multi-phase object construction works in practice.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic</title><link href="https://mikhas.github.io/blog/" rel="alternate"></link><link href="https://mikhas.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>https://mikhas.github.io/blog/</id><updated>2024-08-26T00:00:00+02:00</updated><entry><title>How objects are constructed and set up in QML</title><link href="https://mikhas.github.io/blog/multi-phase-construction.html" rel="alternate"></link><published>2024-08-20T00:00:00+02:00</published><updated>2024-08-24T00:00:00+02:00</updated><author><name>Michael Hasselmann</name></author><id>tag:mikhas.github.io,2024-08-20:/blog/multi-phase-construction.html</id><summary type="html">&lt;p class="first last"&gt;A brief introduction to making custom types in QML, and how the multi-phase object construction works in practice.&lt;/p&gt;
 </summary><content type="html">&lt;div class="section" id="making-a-new-type"&gt;
 &lt;h2&gt;Making a new type&lt;/h2&gt;
 &lt;p&gt;Here's how you derive a new class from a base class in pure QML, with a public
@@ -16,7 +16,7 @@ API of two mandatory properties. They fill the role of constructor parameters:&l
 if the file name is &lt;tt class="docutils literal"&gt;Derived.qml&lt;/tt&gt;, the new type will be available under
 &lt;tt class="docutils literal"&gt;Derived&lt;/tt&gt;. This behaviour can be controlled in a special module file called
 &lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt;.&lt;/p&gt;
-&lt;p&gt;We can now instantiate an object from the component:&lt;/p&gt;
+&lt;p&gt;We can now instantiate our object from the component:&lt;/p&gt;
 &lt;pre class="code qml literal-block"&gt;
 &lt;span class="nx"&gt;Derived&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="k"&gt;amount:&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
@@ -127,4 +127,183 @@ would be the &lt;tt class="docutils literal"&gt;ApplicationWindow&lt;/tt&gt;, so
 recursive construction spans all components nested within, with each component
 following the multi-phase construction process.&lt;/p&gt;
 &lt;/div&gt;
-</content><category term="Starter Kit"></category><category term="QML"></category></entry></feed>
+</content><category term="Starter Kit"></category><category term="QML"></category></entry><entry><title>Launching into QML from Python</title><link href="https://mikhas.github.io/blog/launch-qml-from-python.html" rel="alternate"></link><published>2024-08-19T00:00:00+02:00</published><updated>2024-08-26T00:00:00+02:00</updated><author><name>Michael Hasselmann</name></author><id>tag:mikhas.github.io,2024-08-19:/blog/launch-qml-from-python.html</id><summary type="html">&lt;p class="first last"&gt;This blog post quickly goes through the initial steps of developing a
+QML app with a Python backend.&lt;/p&gt;
+</summary><content type="html">&lt;div class="section" id="installing-pyside6"&gt;
+&lt;h2&gt;Installing PySide6&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;path/to/my/project
+$&lt;span class="w"&gt; &lt;/span&gt;python3&lt;span class="w"&gt; &lt;/span&gt;-m&lt;span class="w"&gt; &lt;/span&gt;venv&lt;span class="w"&gt; &lt;/span&gt;env
+$&lt;span class="w"&gt; &lt;/span&gt;.&lt;span class="w"&gt; &lt;/span&gt;./env/bin/activate
+$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;pip&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;PySide6
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;That's it! You now have the officially endorsed Python bindings &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt; which
+include everything we'll need to start:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The Qt framework, wrapped in a Python API,&lt;/li&gt;
+&lt;li&gt;QML, a declarative language that feels as if HTML, CSS and JavaScript had all
+been rolled into one compelling package,&lt;/li&gt;
+&lt;li&gt;QtQuick Components, a Qt Widgets alternative for QML.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="defining-the-entry-points"&gt;
+&lt;h2&gt;Defining the entry points&lt;/h2&gt;
+&lt;p&gt;Combining Python and QML requires us to define several entry points:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;One for the Python interpreter,&lt;/li&gt;
+&lt;li&gt;one for the Qt framework,&lt;/li&gt;
+&lt;li&gt;and one for QML.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;For Python, we set the entry point like so:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;For Qt, we need to initialize the framework and then kick off the main loop:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QGuiApplication&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exec&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;For QML, we create the engine and point it to the component it should load as
+its root element:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;engine&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QQmlApplicationEngine&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;engine&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;loadFromModule&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;MyApp.UI&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Main&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Here's the full launcher script (&lt;tt class="docutils literal"&gt;main.py&lt;/tt&gt;), with code comments:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="ln"&gt; 1 &lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;signal&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 2 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;fspath&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 3 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 4 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;pathlib&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Path&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 5 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 6 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;PySide6.QtQml&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;QQmlApplicationEngine&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 7 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;PySide6.QtCore&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Qt&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 8 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;PySide6.QtGui&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;QGuiApplication&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 9 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;PySide6.QtQuickControls2&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;QQuickStyle&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;10 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;11 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;12 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;run&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;13 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# Shuts down the app when pressing Ctrl-C in the terminal.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;14 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# For proper handling, check matplotlib's `_allow_interrupt(...)`&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;15 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# implementation.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;16 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="n"&gt;signal&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;signal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;signal&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SIGINT&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;signal&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SIG_DFL&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;17 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;18 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# We need to set the style early, or else the engine complains.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;19 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="n"&gt;QQuickStyle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setStyle&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Universal&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;20 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;21 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# Also parses Qt-specific command line arguments.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;22 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QGuiApplication&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;23 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# The engine is responsible for executing QML code.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;24 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="n"&gt;engine&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;QQmlApplicationEngine&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;25 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="n"&gt;engine&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objectCreationFailed&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;quit&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Qt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;QueuedConnection&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;26 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# Search for QML modules in the same directory as our `main.py`.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;27 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="n"&gt;engine&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;addImportPath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fspath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="vm"&gt;__file__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;28 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# The module name &amp;quot;MyApp.UI&amp;quot; is translated into a path.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;29 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# &amp;quot;Main&amp;quot; is defined in &amp;quot;MyApp/UI/Main.qml&amp;quot; and will be loaded as the&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;30 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# engine's root element.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;31 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="n"&gt;engine&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;loadFromModule&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;MyApp.UI&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Main&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;32 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;33 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# Yield control from the Python interpreter to the Qt event loop.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;34 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exec&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;35 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;36 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;37 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;38 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;run&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This allows us to run the app from the command line like so:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;python3&lt;span class="w"&gt; &lt;/span&gt;main.py
+QQmlApplicationEngine&lt;span class="w"&gt; &lt;/span&gt;failed&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;load&lt;span class="w"&gt; &lt;/span&gt;component
+&amp;lt;Unknown&lt;span class="w"&gt; &lt;/span&gt;File&amp;gt;:&lt;span class="w"&gt; &lt;/span&gt;No&lt;span class="w"&gt; &lt;/span&gt;module&lt;span class="w"&gt; &lt;/span&gt;named&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;MyApp.UI&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;found
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The Python interpreter complains about the missing QML module. Let's fix that:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;mkdir&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;MyApp/UI
+$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;touch&lt;span class="w"&gt; &lt;/span&gt;MyApp/UI/qmldir
+$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;touch&lt;span class="w"&gt; &lt;/span&gt;MyApp/UI/Main.qml
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt; is QML's way of declaring modules &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt;. In that file, we list all QML
+file belonging to the module. Each QML module requires its own &lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt;, and
+there can only be per directory. One QML module however can span multiple
+directories.&lt;/p&gt;
+&lt;p&gt;In our case, the module contains a single file, &lt;tt class="docutils literal"&gt;Main.qml&lt;/tt&gt;, but we need to
+map it to its component name, which is just &lt;tt class="docutils literal"&gt;Main&lt;/tt&gt;. We could have chosen
+other names but &lt;tt class="docutils literal"&gt;Main&lt;/tt&gt; fits the theme of defining entry points.&lt;/p&gt;
+&lt;p&gt;Here's our &lt;tt class="docutils literal"&gt;MyApp/UI/qmldir&lt;/tt&gt; file:&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="ln"&gt;1 &lt;/span&gt;&lt;span class="nx"&gt;module&lt;/span&gt; &lt;span class="nx"&gt;MyApp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;UI&lt;/span&gt;
+&lt;span class="ln"&gt;2 &lt;/span&gt;&lt;span class="nx"&gt;Main&lt;/span&gt; &lt;span class="mf"&gt;1.0&lt;/span&gt; &lt;span class="nx"&gt;Main&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;qml&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;1.0&lt;/tt&gt; is the version of the component. QtQuick Components make heavy use of
+that feature, but app developers can safely ignore it and just always keep the
+initial version for their own components.&lt;/p&gt;
+&lt;p&gt;We now know what QML modules are and how to point to them from Python. We've
+also seen the majority of what QML modules have to offer, and why &lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt;
+files exist.&lt;/p&gt;
+&lt;p&gt;Anyway, let's try running our app again!&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;python3&lt;span class="w"&gt; &lt;/span&gt;main.py
+QQmlApplicationEngine&lt;span class="w"&gt; &lt;/span&gt;failed&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;load&lt;span class="w"&gt; &lt;/span&gt;component
+file:///full/path/to/my/project/MyApp/UI/Main.qml:&lt;span class="w"&gt; &lt;/span&gt;File&lt;span class="w"&gt; &lt;/span&gt;is&lt;span class="w"&gt; &lt;/span&gt;empty
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Despite the new error message, we should notice that the QML engine got much
+farther this time: It found the module, read the &lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt; and loaded
+&lt;tt class="docutils literal"&gt;Main.qml&lt;/tt&gt; as it expects to find the definition of the &lt;tt class="docutils literal"&gt;Main&lt;/tt&gt; component in
+there. But empty QML files make no valid component.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-applicationwindow"&gt;
+&lt;h2&gt;The ApplicationWindow&lt;/h2&gt;
+&lt;p&gt;The root element of your QML app should almost always be the
+&lt;tt class="docutils literal"&gt;ApplicationWindow&lt;/tt&gt; &lt;a class="footnote-reference" href="#footnote-3" id="footnote-reference-3"&gt;[3]&lt;/a&gt; itself. Here's our &lt;tt class="docutils literal"&gt;Main.qml&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="ln"&gt; 1 &lt;/span&gt;&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;QtQuick&lt;/span&gt;
+&lt;span class="ln"&gt; 2 &lt;/span&gt;&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;QtQuick&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Controls&lt;/span&gt;
+&lt;span class="ln"&gt; 3 &lt;/span&gt;
+&lt;span class="ln"&gt; 4 &lt;/span&gt;
+&lt;span class="ln"&gt; 5 &lt;/span&gt;&lt;span class="nx"&gt;ApplicationWindow&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="ln"&gt; 6 &lt;/span&gt;    &lt;span class="kd"&gt;id: root&lt;/span&gt;
+&lt;span class="ln"&gt; 7 &lt;/span&gt;
+&lt;span class="ln"&gt; 8 &lt;/span&gt;    &lt;span class="k"&gt;title:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;My first QML app&amp;quot;&lt;/span&gt;
+&lt;span class="ln"&gt; 9 &lt;/span&gt;    &lt;span class="k"&gt;width:&lt;/span&gt; &lt;span class="mi"&gt;1280&lt;/span&gt;
+&lt;span class="ln"&gt;10 &lt;/span&gt;    &lt;span class="k"&gt;height:&lt;/span&gt; &lt;span class="mi"&gt;800&lt;/span&gt;
+&lt;span class="ln"&gt;11 &lt;/span&gt;    &lt;span class="c1"&gt;// Everybody forgets to set `visible` to `true` the first time. Right, Trin?
+&lt;/span&gt;&lt;span class="ln"&gt;12 &lt;/span&gt;&lt;span class="c1"&gt;&lt;/span&gt;    &lt;span class="k"&gt;visible:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;span class="ln"&gt;13 &lt;/span&gt;
+&lt;span class="ln"&gt;14 &lt;/span&gt;    &lt;span class="nx"&gt;Text&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="ln"&gt;15 &lt;/span&gt;        &lt;span class="k"&gt;anchors.centerIn:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;
+&lt;span class="ln"&gt;16 &lt;/span&gt;        &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;It works! Our window resolution is &amp;quot;&lt;/span&gt;
+&lt;span class="ln"&gt;17 &lt;/span&gt;            &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="nx"&gt;x$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;height&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="nx"&gt;pixels&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;
+&lt;span class="ln"&gt;18 &lt;/span&gt;    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="ln"&gt;19 &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Launching the app should now look similar to this:&lt;/p&gt;
+&lt;img alt="Screenshot of the application's main window" src="https://mikhas.github.io/blog/images/app-template/it-works.png" /&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;text&lt;/tt&gt; property inside the &lt;tt class="docutils literal"&gt;Text&lt;/tt&gt; component uses a mix of static text
+and dynamically computed text. Resize the window to see the text update in
+real-time.&lt;/p&gt;
+&lt;p&gt;We haven't added a real Python backend yet, nor have we created a practical
+layout for extending the UI. We do however have a robust app template &lt;a class="footnote-reference" href="#footnote-4" id="footnote-reference-4"&gt;[4]&lt;/a&gt; with
+an extendable project structure and can start experimenting with QML.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-1" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label" /&gt;&lt;col /&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://doc.qt.io/qtforpython-6/"&gt;Qt for Python&lt;/a&gt; mainly focuses on Qt Widget applications whereas we focus on QML&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-2" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label" /&gt;&lt;col /&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;qmldir: &lt;a class="reference external" href="https://doc.qt.io/qt-6/qtqml-modules-qmldir.html"&gt;module definition file&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-3" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label" /&gt;&lt;col /&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-3"&gt;[3]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;QML's &lt;a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-applicationwindow.html"&gt;ApplicationWindow&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-4" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label" /&gt;&lt;col /&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-4"&gt;[4]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;The &lt;a class="reference external" href="https://mikhas.github.io/blog/src/app-template.zip"&gt;app template&lt;/a&gt; used in this blog post&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+</content><category term="Starter Kit"></category><category term="QML"></category><category term="PySide6"></category><category term="qmldir"></category><category term="ApplicationWindow"></category></entry></feed>

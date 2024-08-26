@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="https://mikhas.github.io/blog/theme/css/elegant.prod.9e9d5ce754.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="https://mikhas.github.io/blog/theme/css/custom.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="https://mikhas.github.io/blog/theme/css/pygments.css" media="screen">
+
+        <link rel="dns-prefetch" href="//fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+
+        <meta name="author" content="Michael Hasselmann" />
+
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content="QML, PySide6, qmldir, ApplicationWindow, Starter Kit, " />
+
+<meta property="og:title" content="Launching into QML from Python "/>
+<meta property="og:url" content="https://mikhas.github.io/blog/launch-qml-from-python.html" />
+<meta property="og:description" content="This blog post quickly goes through the initial steps of developing a QML app with a Python backend." />
+<meta property="og:site_name" content="Quite Meticulous Logic" />
+<meta property="og:article:author" content="Michael Hasselmann" />
+<meta property="og:article:published_time" content="2024-08-19T00:00:00+02:00" />
+<meta property="og:article:modified_time" content="2024-08-26T00:00:00+02:00" />
+<meta name="twitter:title" content="Launching into QML from Python ">
+<meta name="twitter:description" content="This blog post quickly goes through the initial steps of developing a QML app with a Python backend.">
+
+        <title>Launching into QML from Python  · Quite Meticulous Logic
+</title>
+        <link href="https://mikhas.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Quite Meticulous Logic - Full Atom Feed" />
+
+
+
+    </head>
+    <body>
+        <div id="content">
+            <div class="navbar navbar-static-top">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+                        <a class="brand" href="https://mikhas.github.io/blog/"><span class=site-name>Quite Meticulous Logic</span></a>
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right top-menu">
+                                <li >
+                                    <a href=
+                                       https://mikhas.github.io/blog
+                                    >Home</a>
+                                </li>
+                                <li ><a href="https://mikhas.github.io/blog/categories.html">Categories</a></li>
+                                <li ><a href="https://mikhas.github.io/blog/tags.html">Tags</a></li>
+                                <li ><a href="https://mikhas.github.io/blog/archives.html">Archives</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span1"></div>
+                    <div class="span10">
+<article itemscope>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+        <h1>
+            <a href="https://mikhas.github.io/blog/launch-qml-from-python.html">
+                Launching into QML from Python
+            </a>
+        </h1>
+    </header>
+</div>
+
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+            
+            <div class="section" id="installing-pyside6">
+<h2>Installing PySide6</h2>
+<div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>path/to/my/project
+$<span class="w"> </span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>env
+$<span class="w"> </span>.<span class="w"> </span>./env/bin/activate
+$<span class="w"> </span><span class="o">(</span>env<span class="o">)</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>PySide6
+</pre></div>
+<p>That's it! You now have the officially endorsed Python bindings <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a> which
+include everything we'll need to start:</p>
+<ul class="simple">
+<li>The Qt framework, wrapped in a Python API,</li>
+<li>QML, a declarative language that feels as if HTML, CSS and JavaScript had all
+been rolled into one compelling package,</li>
+<li>QtQuick Components, a Qt Widgets alternative for QML.</li>
+</ul>
+</div>
+<div class="section" id="defining-the-entry-points">
+<h2>Defining the entry points</h2>
+<p>Combining Python and QML requires us to define several entry points:</p>
+<ol class="arabic simple">
+<li>One for the Python interpreter,</li>
+<li>one for the Qt framework,</li>
+<li>and one for QML.</li>
+</ol>
+<p>For Python, we set the entry point like so:</p>
+<div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="o">...</span>
+</pre></div>
+<p>For Qt, we need to initialize the framework and then kick off the main loop:</p>
+<div class="highlight"><pre><span></span><span class="n">app</span> <span class="o">=</span> <span class="n">QGuiApplication</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+<span class="n">exit</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">exec</span><span class="p">())</span>
+</pre></div>
+<p>For QML, we create the engine and point it to the component it should load as
+its root element:</p>
+<div class="highlight"><pre><span></span><span class="n">engine</span> <span class="o">=</span> <span class="n">QQmlApplicationEngine</span><span class="p">()</span>
+<span class="n">engine</span><span class="o">.</span><span class="n">loadFromModule</span><span class="p">(</span><span class="s2">&quot;MyApp.UI&quot;</span><span class="p">,</span> <span class="s2">&quot;Main&quot;</span><span class="p">)</span>
+</pre></div>
+<p>Here's the full launcher script (<tt class="docutils literal">main.py</tt>), with code comments:</p>
+<pre class="code python literal-block">
+<span class="ln"> 1 </span><span class="kn">import</span> <span class="nn">signal</span><span class="w">
+</span><span class="ln"> 2 </span><span class="w"></span><span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">fspath</span><span class="w">
+</span><span class="ln"> 3 </span><span class="w"></span><span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">argv</span><span class="p">,</span> <span class="n">exit</span><span class="w">
+</span><span class="ln"> 4 </span><span class="w"></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="w">
+</span><span class="ln"> 5 </span><span class="w">
+</span><span class="ln"> 6 </span><span class="w"></span><span class="kn">from</span> <span class="nn">PySide6.QtQml</span> <span class="kn">import</span> <span class="n">QQmlApplicationEngine</span><span class="w">
+</span><span class="ln"> 7 </span><span class="w"></span><span class="kn">from</span> <span class="nn">PySide6.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="w">
+</span><span class="ln"> 8 </span><span class="w"></span><span class="kn">from</span> <span class="nn">PySide6.QtGui</span> <span class="kn">import</span> <span class="n">QGuiApplication</span><span class="w">
+</span><span class="ln"> 9 </span><span class="w"></span><span class="kn">from</span> <span class="nn">PySide6.QtQuickControls2</span> <span class="kn">import</span> <span class="n">QQuickStyle</span><span class="w">
+</span><span class="ln">10 </span><span class="w">
+</span><span class="ln">11 </span><span class="w">
+</span><span class="ln">12 </span><span class="w"></span><span class="k">def</span> <span class="nf">run</span><span class="p">():</span><span class="w">
+</span><span class="ln">13 </span><span class="w"></span>    <span class="c1"># Shuts down the app when pressing Ctrl-C in the terminal.</span><span class="w">
+</span><span class="ln">14 </span><span class="w"></span>    <span class="c1"># For proper handling, check matplotlib's `_allow_interrupt(...)`</span><span class="w">
+</span><span class="ln">15 </span><span class="w"></span>    <span class="c1"># implementation.</span><span class="w">
+</span><span class="ln">16 </span><span class="w"></span>    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIG_DFL</span><span class="p">)</span><span class="w">
+</span><span class="ln">17 </span><span class="w">
+</span><span class="ln">18 </span><span class="w"></span>    <span class="c1"># We need to set the style early, or else the engine complains.</span><span class="w">
+</span><span class="ln">19 </span><span class="w"></span>    <span class="n">QQuickStyle</span><span class="o">.</span><span class="n">setStyle</span><span class="p">(</span><span class="s2">&quot;Universal&quot;</span><span class="p">)</span><span class="w">
+</span><span class="ln">20 </span><span class="w">
+</span><span class="ln">21 </span><span class="w"></span>    <span class="c1"># Also parses Qt-specific command line arguments.</span><span class="w">
+</span><span class="ln">22 </span><span class="w"></span>    <span class="n">app</span> <span class="o">=</span> <span class="n">QGuiApplication</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span><span class="w">
+</span><span class="ln">23 </span><span class="w"></span>    <span class="c1"># The engine is responsible for executing QML code.</span><span class="w">
+</span><span class="ln">24 </span><span class="w"></span>    <span class="n">engine</span> <span class="o">=</span> <span class="n">QQmlApplicationEngine</span><span class="p">()</span><span class="w">
+</span><span class="ln">25 </span><span class="w"></span>    <span class="n">engine</span><span class="o">.</span><span class="n">objectCreationFailed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">quit</span><span class="p">,</span> <span class="n">Qt</span><span class="o">.</span><span class="n">QueuedConnection</span><span class="p">)</span><span class="w">
+</span><span class="ln">26 </span><span class="w"></span>    <span class="c1"># Search for QML modules in the same directory as our `main.py`.</span><span class="w">
+</span><span class="ln">27 </span><span class="w"></span>    <span class="n">engine</span><span class="o">.</span><span class="n">addImportPath</span><span class="p">(</span><span class="n">fspath</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span><span class="w">
+</span><span class="ln">28 </span><span class="w"></span>    <span class="c1"># The module name &quot;MyApp.UI&quot; is translated into a path.</span><span class="w">
+</span><span class="ln">29 </span><span class="w"></span>    <span class="c1"># &quot;Main&quot; is defined in &quot;MyApp/UI/Main.qml&quot; and will be loaded as the</span><span class="w">
+</span><span class="ln">30 </span><span class="w"></span>    <span class="c1"># engine's root element.</span><span class="w">
+</span><span class="ln">31 </span><span class="w"></span>    <span class="n">engine</span><span class="o">.</span><span class="n">loadFromModule</span><span class="p">(</span><span class="s2">&quot;MyApp.UI&quot;</span><span class="p">,</span> <span class="s2">&quot;Main&quot;</span><span class="p">)</span><span class="w">
+</span><span class="ln">32 </span><span class="w">
+</span><span class="ln">33 </span><span class="w"></span>    <span class="c1"># Yield control from the Python interpreter to the Qt event loop.</span><span class="w">
+</span><span class="ln">34 </span><span class="w"></span>    <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span><span class="w">
+</span><span class="ln">35 </span><span class="w">
+</span><span class="ln">36 </span><span class="w">
+</span><span class="ln">37 </span><span class="w"></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span><span class="w">
+</span><span class="ln">38 </span><span class="w"></span>    <span class="n">exit</span><span class="p">(</span><span class="n">run</span><span class="p">())</span>
+</pre>
+<p>This allows us to run the app from the command line like so:</p>
+<div class="highlight"><pre><span></span>$<span class="w"> </span><span class="o">(</span>env<span class="o">)</span><span class="w"> </span>python3<span class="w"> </span>main.py
+QQmlApplicationEngine<span class="w"> </span>failed<span class="w"> </span>to<span class="w"> </span>load<span class="w"> </span>component
+&lt;Unknown<span class="w"> </span>File&gt;:<span class="w"> </span>No<span class="w"> </span>module<span class="w"> </span>named<span class="w"> </span><span class="s2">&quot;MyApp.UI&quot;</span><span class="w"> </span>found
+</pre></div>
+<p>The Python interpreter complains about the missing QML module. Let's fix that:</p>
+<div class="highlight"><pre><span></span>$<span class="w"> </span><span class="o">(</span>env<span class="o">)</span><span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>MyApp/UI
+$<span class="w"> </span><span class="o">(</span>env<span class="o">)</span><span class="w"> </span>touch<span class="w"> </span>MyApp/UI/qmldir
+$<span class="w"> </span><span class="o">(</span>env<span class="o">)</span><span class="w"> </span>touch<span class="w"> </span>MyApp/UI/Main.qml
+</pre></div>
+<p><tt class="docutils literal">qmldir</tt> is QML's way of declaring modules <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a>. In that file, we list all QML
+file belonging to the module. Each QML module requires its own <tt class="docutils literal">qmldir</tt>, and
+there can only be per directory. One QML module however can span multiple
+directories.</p>
+<p>In our case, the module contains a single file, <tt class="docutils literal">Main.qml</tt>, but we need to
+map it to its component name, which is just <tt class="docutils literal">Main</tt>. We could have chosen
+other names but <tt class="docutils literal">Main</tt> fits the theme of defining entry points.</p>
+<p>Here's our <tt class="docutils literal">MyApp/UI/qmldir</tt> file:</p>
+<pre class="code qml literal-block">
+<span class="ln">1 </span><span class="nx">module</span> <span class="nx">MyApp</span><span class="p">.</span><span class="nx">UI</span>
+<span class="ln">2 </span><span class="nx">Main</span> <span class="mf">1.0</span> <span class="nx">Main</span><span class="p">.</span><span class="nx">qml</span>
+</pre>
+<p><tt class="docutils literal">1.0</tt> is the version of the component. QtQuick Components make heavy use of
+that feature, but app developers can safely ignore it and just always keep the
+initial version for their own components.</p>
+<p>We now know what QML modules are and how to point to them from Python. We've
+also seen the majority of what QML modules have to offer, and why <tt class="docutils literal">qmldir</tt>
+files exist.</p>
+<p>Anyway, let's try running our app again!</p>
+<div class="highlight"><pre><span></span>$<span class="w"> </span><span class="o">(</span>env<span class="o">)</span><span class="w"> </span>python3<span class="w"> </span>main.py
+QQmlApplicationEngine<span class="w"> </span>failed<span class="w"> </span>to<span class="w"> </span>load<span class="w"> </span>component
+file:///full/path/to/my/project/MyApp/UI/Main.qml:<span class="w"> </span>File<span class="w"> </span>is<span class="w"> </span>empty
+</pre></div>
+<p>Despite the new error message, we should notice that the QML engine got much
+farther this time: It found the module, read the <tt class="docutils literal">qmldir</tt> and loaded
+<tt class="docutils literal">Main.qml</tt> as it expects to find the definition of the <tt class="docutils literal">Main</tt> component in
+there. But empty QML files make no valid component.</p>
+</div>
+<div class="section" id="the-applicationwindow">
+<h2>The ApplicationWindow</h2>
+<p>The root element of your QML app should almost always be the
+<tt class="docutils literal">ApplicationWindow</tt> <a class="footnote-reference" href="#footnote-3" id="footnote-reference-3">[3]</a> itself. Here's our <tt class="docutils literal">Main.qml</tt>:</p>
+<pre class="code qml literal-block">
+<span class="ln"> 1 </span><span class="kr">import</span> <span class="nx">QtQuick</span>
+<span class="ln"> 2 </span><span class="kr">import</span> <span class="nx">QtQuick</span><span class="p">.</span><span class="nx">Controls</span>
+<span class="ln"> 3 </span>
+<span class="ln"> 4 </span>
+<span class="ln"> 5 </span><span class="nx">ApplicationWindow</span> <span class="p">{</span>
+<span class="ln"> 6 </span>    <span class="kd">id: root</span>
+<span class="ln"> 7 </span>
+<span class="ln"> 8 </span>    <span class="k">title:</span> <span class="s2">&quot;My first QML app&quot;</span>
+<span class="ln"> 9 </span>    <span class="k">width:</span> <span class="mi">1280</span>
+<span class="ln">10 </span>    <span class="k">height:</span> <span class="mi">800</span>
+<span class="ln">11 </span>    <span class="c1">// Everybody forgets to set `visible` to `true` the first time. Right, Trin?
+</span><span class="ln">12 </span><span class="c1"></span>    <span class="k">visible:</span> <span class="kc">true</span>
+<span class="ln">13 </span>
+<span class="ln">14 </span>    <span class="nx">Text</span> <span class="p">{</span>
+<span class="ln">15 </span>        <span class="k">anchors.centerIn:</span> <span class="nx">parent</span>
+<span class="ln">16 </span>        <span class="k">text:</span> <span class="s2">&quot;It works! Our window resolution is &quot;</span>
+<span class="ln">17 </span>            <span class="o">+</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">width</span><span class="p">}</span><span class="nx">x$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">height</span><span class="p">}</span> <span class="nx">pixels</span><span class="p">.</span><span class="err">`</span>
+<span class="ln">18 </span>    <span class="p">}</span>
+<span class="ln">19 </span><span class="p">}</span>
+</pre>
+<p>Launching the app should now look similar to this:</p>
+<img alt="Screenshot of the application's main window" src="https://mikhas.github.io/blog/images/app-template/it-works.png" />
+<p>The <tt class="docutils literal">text</tt> property inside the <tt class="docutils literal">Text</tt> component uses a mix of static text
+and dynamically computed text. Resize the window to see the text update in
+real-time.</p>
+<p>We haven't added a real Python backend yet, nor have we created a practical
+layout for extending the UI. We do however have a robust app template <a class="footnote-reference" href="#footnote-4" id="footnote-reference-4">[4]</a> with
+an extendable project structure and can start experimenting with QML.</p>
+</div>
+<div class="section" id="references">
+<h2>References</h2>
+<table class="docutils footnote" frame="void" id="footnote-1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-1">[1]</a></td><td><a class="reference external" href="https://doc.qt.io/qtforpython-6/">Qt for Python</a> mainly focuses on Qt Widget applications whereas we focus on QML</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-2">[2]</a></td><td>qmldir: <a class="reference external" href="https://doc.qt.io/qt-6/qtqml-modules-qmldir.html">module definition file</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-3">[3]</a></td><td>QML's <a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-applicationwindow.html">ApplicationWindow</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-4">[4]</a></td><td>The <a class="reference external" href="https://mikhas.github.io/blog/src/app-template.zip">app template</a> used in this blog post</td></tr>
+</tbody>
+</table>
+</div>
+
+
+
+             
+ 
+            
+            
+            
+
+
+
+
+
+
+
+            <hr/>
+        </div>
+        <section id="article-sidebar" class="span2">
+            <h4>Published</h4>
+            <time itemprop="dateCreated" datetime="2024-08-19T00:00:00+02:00">Mon 19 August 2024</time>
+<h4>Last Updated</h4>
+<time datetime="2024-08-26T00:00:00+02:00">Mon 26 August 2024</time>
+
+            <h4>Category</h4>
+            <a class="category-link" href="https://mikhas.github.io/blog/categories.html#starter-kit-ref">Starter Kit</a>
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article">
+                <li><a href="https://mikhas.github.io/blog/tags.html#applicationwindow-ref">ApplicationWindow
+                    <span class="superscript">1</span>
+</a></li>
+                <li><a href="https://mikhas.github.io/blog/tags.html#pyside6-ref">PySide6
+                    <span class="superscript">1</span>
+</a></li>
+                <li><a href="https://mikhas.github.io/blog/tags.html#qml-ref">QML
+                    <span class="superscript">2</span>
+</a></li>
+                <li><a href="https://mikhas.github.io/blog/tags.html#qmldir-ref">qmldir
+                    <span class="superscript">1</span>
+</a></li>
+            </ul>
+<h4>Contact</h4>
+<div id="sidebar-social-link">
+    <a href="https://linkedin.com/in/michaelhasselmann" title="" target="_blank" rel="nofollow noopener noreferrer">
+        <svg xmlns="http://www.w3.org/2000/svg" aria-label="LinkedIn" role="img" viewBox="0 0 512 512" fill="#fff"><rect width="512" height="512" rx="15%" fill="#0077b5"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg>
+    </a>
+    <a href="https://github.com/mikhas" title="" target="_blank" rel="nofollow noopener noreferrer">
+        <svg xmlns="http://www.w3.org/2000/svg" aria-label="GitHub" role="img" viewBox="0 0 512 512"><rect width="512" height="512" rx="15%" fill="#1B1817"/><path fill="#fff" d="M335 499c14 0 12 17 12 17H165s-2-17 12-17c13 0 16-6 16-12l-1-50c-71 16-86-28-86-28-12-30-28-37-28-37-24-16 1-16 1-16 26 2 40 26 40 26 22 39 59 28 74 22 2-17 9-28 16-35-57-6-116-28-116-126 0-28 10-51 26-69-3-6-11-32 3-67 0 0 21-7 70 26 42-12 86-12 128 0 49-33 70-26 70-26 14 35 6 61 3 67 16 18 26 41 26 69 0 98-60 120-117 126 10 8 18 24 18 48l-1 70c0 6 3 12 16 12z"/></svg>
+    </a>
+</div>
+            
+
+
+
+
+
+            
+
+
+
+
+
+        </section>
+</div>
+</article>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>                    </div>
+                    <div class="span1"></div>
+                </div>
+            </div>
+        </div>
+<footer>
+
+
+
+
+</footer>            <script src="https://mikhas.github.io/blog/theme/js/elegant.prod.9e9d5ce754.js"></script>
+
+    <script>
+    (function () {
+        if (window.location.hash.match(/^#comment-\d+$/)) {
+            $('#comment_thread').collapse('show');
+        }
+    })();
+    window.onhashchange=function(){
+        if (window.location.hash.match(/^#comment-\d+$/))
+            window.location.reload(true);
+    }
+    $('#comment_thread').on('shown', function () {
+        var link = document.getElementById('comment-accordion-toggle');
+        var old_innerHTML = link.innerHTML;
+        $(link).fadeOut(200, function() {
+            $(this).text('Click here to hide comments').fadeIn(200);
+        });
+        $('#comment_thread').on('hidden', function () {
+            $(link).fadeOut(200, function() {
+                $(this).text(old_innerHTML).fadeIn(200);
+            });
+        })
+    })
+</script>
+
+    </body>
+    <!-- Theme: Elegant built for Pelican
+        License : MIT -->
+</html>
