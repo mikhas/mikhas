@@ -167,10 +167,9 @@ QQmlApplicationEngine<span class="w"> </span>failed<span class="w"> </span>to<sp
 $<span class="w"> </span><span class="o">(</span>env<span class="o">)</span><span class="w"> </span>touch<span class="w"> </span>MyApp/UI/qmldir
 $<span class="w"> </span><span class="o">(</span>env<span class="o">)</span><span class="w"> </span>touch<span class="w"> </span>MyApp/UI/Main.qml
 </pre></div>
-<p><tt class="docutils literal">qmldir</tt> is QML's way of declaring modules <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a>. In that file, we list all QML
-file belonging to the module. Each QML module requires its own <tt class="docutils literal">qmldir</tt>, and
-there can only be per directory. One QML module however can span multiple
-directories.</p>
+<p><tt class="docutils literal">qmldir</tt> is QML's way of declaring modules <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a>. In that file, we list every
+QML file belonging to the module. Each QML module requires its own <tt class="docutils literal">qmldir</tt>.
+One QML module can span across multiple (sub-) directories.</p>
 <p>In our case, the module contains a single file, <tt class="docutils literal">Main.qml</tt>, but we need to
 map it to its component name, which is just <tt class="docutils literal">Main</tt>. We could have chosen
 other names but <tt class="docutils literal">Main</tt> fits the theme of defining entry points.</p>
@@ -193,7 +192,7 @@ file:///full/path/to/my/project/MyApp/UI/Main.qml:<span class="w"> </span>File<s
 <p>Despite the new error message, we should notice that the QML engine got much
 farther this time: It found the module, read the <tt class="docutils literal">qmldir</tt> and loaded
 <tt class="docutils literal">Main.qml</tt> as it expects to find the definition of the <tt class="docutils literal">Main</tt> component in
-there. But empty QML files make no valid component.</p>
+there. But empty QML files make no valid components.</p>
 </div>
 <div class="section" id="the-applicationwindow">
 <h2>The ApplicationWindow</h2>
@@ -215,7 +214,7 @@ there. But empty QML files make no valid component.</p>
 <span class="ln">13 </span>
 <span class="ln">14 </span>    <span class="nx">Text</span> <span class="p">{</span>
 <span class="ln">15 </span>        <span class="k">anchors.centerIn:</span> <span class="nx">parent</span>
-<span class="ln">16 </span>        <span class="k">text:</span> <span class="s2">&quot;It works! Our window resolution is &quot;</span>
+<span class="ln">16 </span>        <span class="k">text:</span> <span class="s2">&quot;It works! Our application window size is &quot;</span>
 <span class="ln">17 </span>            <span class="o">+</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">width</span><span class="p">}</span><span class="nx">x$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">height</span><span class="p">}</span> <span class="nx">pixels</span><span class="p">.</span><span class="err">`</span>
 <span class="ln">18 </span>    <span class="p">}</span>
 <span class="ln">19 </span><span class="p">}</span>

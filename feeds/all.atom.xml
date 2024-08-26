@@ -217,10 +217,9 @@ QQmlApplicationEngine&lt;span class="w"&gt; &lt;/span&gt;failed&lt;span class="w
 $&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;touch&lt;span class="w"&gt; &lt;/span&gt;MyApp/UI/qmldir
 $&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;env&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;touch&lt;span class="w"&gt; &lt;/span&gt;MyApp/UI/Main.qml
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt; is QML's way of declaring modules &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt;. In that file, we list all QML
-file belonging to the module. Each QML module requires its own &lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt;, and
-there can only be per directory. One QML module however can span multiple
-directories.&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt; is QML's way of declaring modules &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt;. In that file, we list every
+QML file belonging to the module. Each QML module requires its own &lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt;.
+One QML module can span across multiple (sub-) directories.&lt;/p&gt;
 &lt;p&gt;In our case, the module contains a single file, &lt;tt class="docutils literal"&gt;Main.qml&lt;/tt&gt;, but we need to
 map it to its component name, which is just &lt;tt class="docutils literal"&gt;Main&lt;/tt&gt;. We could have chosen
 other names but &lt;tt class="docutils literal"&gt;Main&lt;/tt&gt; fits the theme of defining entry points.&lt;/p&gt;
@@ -243,7 +242,7 @@ file:///full/path/to/my/project/MyApp/UI/Main.qml:&lt;span class="w"&gt; &lt;/sp
 &lt;p&gt;Despite the new error message, we should notice that the QML engine got much
 farther this time: It found the module, read the &lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt; and loaded
 &lt;tt class="docutils literal"&gt;Main.qml&lt;/tt&gt; as it expects to find the definition of the &lt;tt class="docutils literal"&gt;Main&lt;/tt&gt; component in
-there. But empty QML files make no valid component.&lt;/p&gt;
+there. But empty QML files make no valid components.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="the-applicationwindow"&gt;
 &lt;h2&gt;The ApplicationWindow&lt;/h2&gt;
@@ -265,7 +264,7 @@ there. But empty QML files make no valid component.&lt;/p&gt;
 &lt;span class="ln"&gt;13 &lt;/span&gt;
 &lt;span class="ln"&gt;14 &lt;/span&gt;    &lt;span class="nx"&gt;Text&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
 &lt;span class="ln"&gt;15 &lt;/span&gt;        &lt;span class="k"&gt;anchors.centerIn:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;
-&lt;span class="ln"&gt;16 &lt;/span&gt;        &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;It works! Our window resolution is &amp;quot;&lt;/span&gt;
+&lt;span class="ln"&gt;16 &lt;/span&gt;        &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;It works! Our application window size is &amp;quot;&lt;/span&gt;
 &lt;span class="ln"&gt;17 &lt;/span&gt;            &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="nx"&gt;x$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;height&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="nx"&gt;pixels&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;
 &lt;span class="ln"&gt;18 &lt;/span&gt;    &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;span class="ln"&gt;19 &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
