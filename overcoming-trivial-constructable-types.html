@@ -128,7 +128,7 @@ make Python methods directly callable for QML. Here's how:</p>
 <p>Then in QML, we could have for instance:</p>
 <div class="highlight"><pre><span></span><span class="k">otherProp:</span> <span class="nx">MyObject</span> <span class="p">{}</span>
 <span class="k">someProp:</span> <span class="p">{</span>
-    <span class="nx">result</span> <span class="o">=</span> <span class="nx">otherProp</span><span class="p">.</span><span class="nx">callMe</span><span class="p">(</span><span class="nx">arg0</span><span class="p">,</span> <span class="nx">arg1</span><span class="p">,</span> <span class="p">...);</span>
+    <span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">otherProp</span><span class="p">.</span><span class="nx">callMe</span><span class="p">(</span><span class="nx">arg0</span><span class="p">,</span> <span class="nx">arg1</span><span class="p">,</span> <span class="p">...);</span>
     <span class="p">...</span>
 <span class="p">}</span>
 </pre></div>
@@ -240,7 +240,8 @@ the article and the <tt class="docutils literal">Derived</tt> instance we got fr
 Both instances also got created by the QML engine, so they'll live within the
 same thread.</p>
 <p>Where the former was defined as a pure QML type however, the latter offers us
-additional control and implementation flexibility through the Python backend.</p>
+additional control and more implementation flexibility through the Python
+backend.</p>
 </div>
 <div class="section" id="references">
 <h2><a class="toc-backref" href="#toc-entry-4">References</a></h2>
