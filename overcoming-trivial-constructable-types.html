@@ -18,16 +18,16 @@
 
 <meta name="keywords" content="QML, PySide6, Design Pattern, Tips and Tricks, " />
 
-<meta property="og:title" content="Overcoming QML&#39;s requirement of trivially constructable types "/>
+<meta property="og:title" content="Overcoming QML&#39;s restriction of trivially constructable types "/>
 <meta property="og:url" content="https://mikhas.github.io/blog/overcoming-trivial-constructable-types.html" />
-<meta property="og:description" content="Using an adapted Factory pattern, we can overcome the restrictions imposed by the need to have trivially constructable types in QML." />
+<meta property="og:description" content="Using an adapted Factory pattern, we can overcome the restrictions imposed by QML&#39;s declarative syntax to have trivially constructable types." />
 <meta property="og:site_name" content="Quite Meticulous Logic" />
 <meta property="og:article:author" content="Michael Hasselmann" />
-<meta property="og:article:published_time" content="2024-08-21T00:00:00+02:00" />
-<meta name="twitter:title" content="Overcoming QML&#39;s requirement of trivially constructable types ">
-<meta name="twitter:description" content="Using an adapted Factory pattern, we can overcome the restrictions imposed by the need to have trivially constructable types in QML.">
+<meta property="og:article:published_time" content="2024-08-27T00:00:00+02:00" />
+<meta name="twitter:title" content="Overcoming QML&#39;s restriction of trivially constructable types ">
+<meta name="twitter:description" content="Using an adapted Factory pattern, we can overcome the restrictions imposed by QML&#39;s declarative syntax to have trivially constructable types.">
 
-        <title>Overcoming QML&#39;s requirement of trivially constructable types  · Quite Meticulous Logic
+        <title>Overcoming QML&#39;s restriction of trivially constructable types  · Quite Meticulous Logic
 </title>
         <link href="https://mikhas.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Quite Meticulous Logic - Full Atom Feed" />
 
@@ -69,22 +69,201 @@
     <header class="page-header span10 offset2">
         <h1>
             <a href="https://mikhas.github.io/blog/overcoming-trivial-constructable-types.html">
-                Overcoming QML's requirement of trivially constructable types
+                Overcoming QML's restriction of trivially constructable types
             </a>
         </h1>
     </header>
 </div>
 
 <div class="row-fluid">
-        <div class="span8 offset2 article-content">
+    <div class="span2 table-of-content">
+        <nav>
+        <h4>Contents</h4>
+        <div class="toc" id="">
+<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
+<ul class="simple">
+<li><a class="reference internal" href="#problem-statement" id="toc-entry-1">Problem Statement</a></li>
+<li><a class="reference internal" href="#factory-methods-and-singletons" id="toc-entry-2">Factory Methods and Singletons</a></li>
+<li><a class="reference internal" href="#conclusion" id="toc-entry-3">Conclusion</a></li>
+<li><a class="reference internal" href="#references" id="toc-entry-4">References</a></li>
+</ul>
+</div>
+        </nav>
+    </div>
+    <div class="span8 article-content">
             
-            <div class="section" id="introduction">
-<h2>Introduction</h2>
-<p>In <a class="reference external" href="multi-phase-construction">How objects are constructed and set up in QML</a>
-we learned that types, or rather QML components, need to be trivially
-constructable. Apart from the implicit <tt class="docutils literal">parent</tt> parameter, it is seemingly
-impossible for us to add more parameters to the hidden constructor. Instead, we
-rely on properties to set up the object's initial state.</p>
+            
+<div class="section" id="problem-statement">
+<h2><a class="toc-backref" href="#toc-entry-1">Problem Statement</a></h2>
+<p>We already learned <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a> that as a consequence of how new types are defined, QML
+components have to be trivially constructable: Besides the hidden <tt class="docutils literal">parent</tt>
+parameter, no other parameter can be injected directly into the constructor.
+Instead, we have to use properties to set up the object.</p>
+<p>Let's recap how we create object instances in QML:</p>
+<pre class="code qml literal-block">
+<span class="nx">Derived</span> <span class="p">{</span>
+    <span class="k">amount:</span> <span class="mi">5</span>
+    <span class="k">iconSource:</span> <span class="s2">"other/path/to/icon.png"</span>
+<span class="p">}</span>
+</pre>
+<p>But what if <tt class="docutils literal">Derived</tt> was a Python class, defined in our backend? Then the
+restricton on trivial constructors can be annoying. After all, dependency
+injection through constructor parameters <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a> is a versatile design pattern.</p>
+<p>So how can we have our cake and eat it too?</p>
+</div>
+<div class="section" id="factory-methods-and-singletons">
+<h2><a class="toc-backref" href="#toc-entry-2">Factory Methods and Singletons</a></h2>
+<p>Factories? Singletons? Probably not the cake we asked for, but it's arguably
+the best trade-off available in this situation.</p>
+<p>QML mainly interacts with backend objects through properties and slots. Slots
+make Python methods directly callable for QML. Here's how:</p>
+<div class="highlight"><pre><span></span><span class="nd">@Slot</span><span class="p">(</span><span class="n">type0</span><span class="p">,</span> <span class="n">type1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="n">typeN</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">callMe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param0</span><span class="p">:</span> <span class="n">type0</span><span class="p">,</span> <span class="n">param1</span><span class="p">:</span> <span class="n">type1</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typeN</span><span class="p">:</span>
+     <span class="o">...</span>
+</pre></div>
+<p>Then in QML, we could have for instance:</p>
+<div class="highlight"><pre><span></span><span class="k">otherProp:</span> <span class="nx">MyObject</span> <span class="p">{}</span>
+<span class="k">someProp:</span> <span class="p">{</span>
+    <span class="nx">result</span> <span class="o">=</span> <span class="nx">otherProp</span><span class="p">.</span><span class="nx">callMe</span><span class="p">(</span><span class="nx">arg0</span><span class="p">,</span> <span class="nx">arg1</span><span class="p">,</span> <span class="p">...);</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+<p>It's easy to see how inside the slot, we could construct a new object and
+return that instead. Nothing of how slots work in PySide6 prevents us from
+doing that. But we'll need a separate class to store the slot method. That's
+where the factory pattern comes in. Here, it's simply another <tt class="docutils literal">QObject</tt>-based
+type:</p>
+<pre class="code python literal-block">
+<span class="ln">1 </span><span class="nd">@QmlElement</span><span class="w">
+</span><span class="ln">2 </span><span class="w"></span><span class="nd">@QmlSingleton</span><span class="w">
+</span><span class="ln">3 </span><span class="w"></span><span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span><span class="w">
+</span><span class="ln">4 </span><span class="w"></span>    <span class="nd">@Slot</span><span class="p">(</span><span class="n">QUrl</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="n">Derived</span><span class="p">)</span><span class="w">
+</span><span class="ln">5 </span><span class="w"></span>    <span class="k">def</span> <span class="nf">makeDerived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">icon_source</span><span class="p">:</span> <span class="n">QUrl</span><span class="p">,</span> <span class="n">amount</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Derived</span><span class="p">:</span><span class="w">
+</span><span class="ln">6 </span><span class="w"></span>        <span class="k">return</span> <span class="n">Derived</span><span class="p">(</span><span class="n">icon_source</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+</pre>
+<p>We only need one factory instance, so we might as well turn it into a
+singleton, from QML's perspective. The <tt class="docutils literal">QmlSingleton</tt> decorator <a class="footnote-reference" href="#footnote-3" id="footnote-reference-3">[3]</a> does
+just that but it'll only work if we don't provide our own <tt class="docutils literal">__init__()</tt> method
+for the factory.</p>
+<p>The QML singleton simplifies the factory usage on the QML side, as we don't
+need to create a factory instance ourselves:</p>
+<div class="highlight"><pre><span></span><span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">Derived</span> <span class="k">derived:</span> <span class="nx">Factory</span><span class="p">.</span><span class="nx">makeDerived</span><span class="p">(</span><span class="s2">"path/to/icon.png"</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The right side of a property binding in QML is a JavaScript expression. So
+whenever we need to write some imperative code, we make a new property and
+bind a JavaScript code block to it.</p>
+</div>
+<p>Here's the complete implemention of the factory and the <tt class="docutils literal">Derived</tt> class in Python:</p>
+<pre class="code python literal-block">
+<span class="ln"> 1 </span><span class="kn">from</span> <span class="nn">PySide6.QtCore</span> <span class="kn">import</span> <span class="n">Property</span><span class="p">,</span> <span class="n">QObject</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QUrl</span><span class="p">,</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">Slot</span><span class="w">
+</span><span class="ln"> 2 </span><span class="w"></span><span class="kn">from</span> <span class="nn">PySide6.QtQml</span> <span class="kn">import</span> <span class="n">QmlElement</span><span class="p">,</span> <span class="n">QmlSingleton</span><span class="w">
+</span><span class="ln"> 3 </span><span class="w">
+</span><span class="ln"> 4 </span><span class="w"></span><span class="n">QML_IMPORT_NAME</span> <span class="o">=</span> <span class="s2">"MyApp.Tools"</span><span class="w">
+</span><span class="ln"> 5 </span><span class="w"></span><span class="n">QML_IMPORT_MAJOR_VERSION</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="ln"> 6 </span><span class="w">
+</span><span class="ln"> 7 </span><span class="w">
+</span><span class="ln"> 8 </span><span class="w"></span><span class="nd">@QmlElement</span><span class="w">
+</span><span class="ln"> 9 </span><span class="w"></span><span class="k">class</span> <span class="nc">Derived</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span><span class="w">
+</span><span class="ln">10 </span><span class="w"></span>    <span class="n">iconSourceChanged</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">QUrl</span><span class="p">)</span><span class="w">
+</span><span class="ln">11 </span><span class="w"></span>    <span class="n">amountChanged</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="w">
+</span><span class="ln">12 </span><span class="w">
+</span><span class="ln">13 </span><span class="w"></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">icon_source</span><span class="p">:</span> <span class="n">QUrl</span><span class="p">,</span> <span class="n">amount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span><span class="w">
+</span><span class="ln">14 </span><span class="w"></span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span><span class="w">
+</span><span class="ln">15 </span><span class="w"></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_icon_source</span> <span class="o">=</span> <span class="n">icon_source</span><span class="w">
+</span><span class="ln">16 </span><span class="w"></span>        <span class="bp">self</span><span class="o">.</span><span class="n">_amount</span> <span class="o">=</span> <span class="n">amount</span><span class="w">
+</span><span class="ln">17 </span><span class="w">
+</span><span class="ln">18 </span><span class="w"></span>    <span class="nd">@Property</span><span class="p">(</span><span class="n">QUrl</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="n">iconSourceChanged</span><span class="p">)</span><span class="w">
+</span><span class="ln">19 </span><span class="w"></span>    <span class="k">def</span> <span class="nf">iconSource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="w">
+</span><span class="ln">20 </span><span class="w"></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_icon_source</span><span class="w">
+</span><span class="ln">21 </span><span class="w">
+</span><span class="ln">22 </span><span class="w"></span>    <span class="nd">@Property</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="n">amountChanged</span><span class="p">)</span><span class="w">
+</span><span class="ln">23 </span><span class="w"></span>    <span class="k">def</span> <span class="nf">amount</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="w">
+</span><span class="ln">24 </span><span class="w"></span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_amount</span><span class="w">
+</span><span class="ln">25 </span><span class="w">
+</span><span class="ln">26 </span><span class="w">
+</span><span class="ln">27 </span><span class="w"></span><span class="nd">@QmlElement</span><span class="w">
+</span><span class="ln">28 </span><span class="w"></span><span class="nd">@QmlSingleton</span><span class="w">
+</span><span class="ln">29 </span><span class="w"></span><span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span><span class="w">
+</span><span class="ln">30 </span><span class="w"></span>    <span class="c1"># By introducing optional parameters, we've created an overloaded method</span><span class="w">
+</span><span class="ln">31 </span><span class="w"></span>    <span class="c1"># issue that the QML engine cannot resolve unless we define `@Slot`</span><span class="w">
+</span><span class="ln">32 </span><span class="w"></span>    <span class="c1"># decorators for each case.</span><span class="w">
+</span><span class="ln">33 </span><span class="w"></span>    <span class="nd">@Slot</span><span class="p">(</span><span class="n">QUrl</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="n">Derived</span><span class="p">)</span><span class="w">
+</span><span class="ln">34 </span><span class="w"></span>    <span class="nd">@Slot</span><span class="p">(</span><span class="n">QUrl</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">QObject</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="n">Derived</span><span class="p">)</span><span class="w">
+</span><span class="ln">35 </span><span class="w"></span>    <span class="k">def</span> <span class="nf">makeDerived</span><span class="p">(</span><span class="w">
+</span><span class="ln">36 </span><span class="w"></span>        <span class="bp">self</span><span class="p">,</span> <span class="n">icon_source</span><span class="p">:</span> <span class="n">QUrl</span><span class="p">,</span> <span class="n">amount</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">QObject</span> <span class="o">=</span> <span class="kc">None</span><span class="w">
+</span><span class="ln">37 </span><span class="w"></span>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Derived</span><span class="p">:</span><span class="w">
+</span><span class="ln">38 </span><span class="w"></span>        <span class="c1"># We need to decide on an owner, not just for the QML engine.</span><span class="w">
+</span><span class="ln">39 </span><span class="w"></span>        <span class="c1"># Otherwise, we risk that the instance we want to return will</span><span class="w">
+</span><span class="ln">40 </span><span class="w"></span>        <span class="c1"># immediately be cleaned up by Python's garbage collector.</span><span class="w">
+</span><span class="ln">41 </span><span class="w"></span>        <span class="n">owner</span> <span class="o">=</span> <span class="n">parent</span> <span class="k">if</span> <span class="n">parent</span> <span class="k">else</span> <span class="bp">self</span><span class="w">
+</span><span class="ln">42 </span><span class="w"></span>        <span class="k">return</span> <span class="n">Derived</span><span class="p">(</span><span class="n">icon_source</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">owner</span><span class="p">)</span>
+</pre>
+<p>And here's how we can make use of them in QML:</p>
+<pre class="code qml literal-block">
+<span class="ln"> 1 </span><span class="kr">import</span> <span class="nx">QtQuick</span>
+<span class="ln"> 2 </span><span class="kr">import</span> <span class="nx">QtQuick</span><span class="p">.</span><span class="nx">Controls</span>
+<span class="ln"> 3 </span><span class="kr">import</span> <span class="nx">MyApp</span><span class="p">.</span><span class="nx">Tools</span> <span class="nx">as</span> <span class="nx">Tools</span>
+<span class="ln"> 4 </span>
+<span class="ln"> 5 </span>
+<span class="ln"> 6 </span><span class="nx">ApplicationWindow</span> <span class="p">{</span>
+<span class="ln"> 7 </span>    <span class="kd">id: root</span>
+<span class="ln"> 8 </span>
+<span class="ln"> 9 </span>    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">Tools</span><span class="p">.</span><span class="nx">Derived</span> <span class="k">derived:</span> <span class="nx">Tools</span><span class="p">.</span><span class="nx">Factory</span><span class="p">.</span><span class="nx">makeDerived</span><span class="p">(</span>
+<span class="ln">10 </span>        <span class="nx">Qt</span><span class="p">.</span><span class="nx">resolvedUrl</span><span class="p">(</span><span class="s2">"path/to/icon.png"</span><span class="p">),</span> <span class="mi">5</span>
+<span class="ln">11 </span>    <span class="p">)</span>
+<span class="ln">12 </span>
+<span class="ln">13 </span>    <span class="k">title:</span> <span class="s2">"My Little Application"</span>
+<span class="ln">14 </span>    <span class="k">width:</span> <span class="mi">1280</span>
+<span class="ln">15 </span>    <span class="k">height:</span> <span class="mi">800</span>
+<span class="ln">16 </span>    <span class="k">visible:</span> <span class="kc">true</span>
+<span class="ln">17 </span>
+<span class="ln">18 </span>    <span class="nx">Flow</span> <span class="p">{</span>
+<span class="ln">19 </span>        <span class="k">anchors.centerIn:</span> <span class="nx">parent</span>
+<span class="ln">20 </span>        <span class="k">flow:</span> <span class="nx">Flow</span><span class="p">.</span><span class="nx">TopToBottom</span>
+<span class="ln">21 </span>
+<span class="ln">22 </span>        <span class="nx">Text</span> <span class="p">{</span>
+<span class="ln">23 </span>            <span class="k">font.pointSize:</span> <span class="mi">18</span>
+<span class="ln">24 </span>            <span class="k">text:</span> <span class="err">`</span><span class="k">root.derived.amount:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">derived</span><span class="p">.</span><span class="nx">amount</span><span class="p">}</span><span class="err">`</span>
+<span class="ln">25 </span>        <span class="p">}</span>
+<span class="ln">26 </span>        <span class="nx">Text</span> <span class="p">{</span>
+<span class="ln">27 </span>            <span class="k">font.pointSize:</span> <span class="mi">18</span>
+<span class="ln">28 </span>            <span class="k">text:</span> <span class="err">`</span><span class="k">root.derived.iconSource:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">derived</span><span class="p">.</span><span class="nx">iconSource</span><span class="p">}</span><span class="err">`</span>
+<span class="ln">29 </span>        <span class="p">}</span>
+<span class="ln">30 </span>    <span class="p">}</span>
+<span class="ln">31 </span><span class="p">}</span>
+</pre>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#toc-entry-3">Conclusion</a></h2>
+<p>Functionally, the declaratively created instance in the beginning of the
+article and the <tt class="docutils literal">Derived</tt> instance we got from the factory are the same! Both
+instances also got created by the QML engine, so they'll live within the same
+thread.</p>
+<p>Where the former was a pure QML type however, the latter offers us additional
+control and implemention flexibility through the Python backend.</p>
+</div>
+<div class="section" id="references">
+<h2><a class="toc-backref" href="#toc-entry-4">References</a></h2>
+<table class="docutils footnote" frame="void" id="footnote-1" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-1">[1]</a></td><td><a class="reference external" href="multi-phase-construction">How objects are constructed and set up in QML</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-2" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-2">[2]</a></td><td><a class="reference external" href="https://arjancodes.com/blog/python-dependency-injection-best-practices/#constructor-injection">Constructor-based dependency injection</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-3" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-3">[3]</a></td><td><a class="reference external" href="https://pages-test.qt.io/qtforpython-6/PySide6/QtQml/QmlSingleton.html">QmlSingleton decorator</a></td></tr>
+</tbody>
+</table>
 </div>
 
 
@@ -105,18 +284,19 @@ rely on properties to set up the object's initial state.</p>
         </div>
         <section id="article-sidebar" class="span2">
             <h4>Published</h4>
-            <time itemprop="dateCreated" datetime="2024-08-21T00:00:00+02:00">Wed 21 August 2024</time>
+            <time itemprop="dateCreated" datetime="2024-08-27T00:00:00+02:00">Tue 27 August 2024</time>
             <h4>Category</h4>
             <a class="category-link" href="https://mikhas.github.io/blog/categories.html#tips-and-tricks-ref">Tips and Tricks</a>
             <h4>Tags</h4>
             <ul class="list-of-tags tags-in-article">
                 <li><a href="https://mikhas.github.io/blog/tags.html#design-pattern-ref">Design Pattern
-</a></li>
-                <li><a href="https://mikhas.github.io/blog/tags.html#pyside6-ref">PySide6
                     <span class="superscript">1</span>
 </a></li>
-                <li><a href="https://mikhas.github.io/blog/tags.html#qml-ref">QML
+                <li><a href="https://mikhas.github.io/blog/tags.html#pyside6-ref">PySide6
                     <span class="superscript">2</span>
+</a></li>
+                <li><a href="https://mikhas.github.io/blog/tags.html#qml-ref">QML
+                    <span class="superscript">3</span>
 </a></li>
             </ul>
 <h4>Contact</h4>

@@ -16,3 +16,7 @@ table tbody > tr:nth-child(2n+1) > td, td.label, td {
 table colgroup {
   width: 10px;
 }
+
+p.topic-title {
+  display: none;
+}

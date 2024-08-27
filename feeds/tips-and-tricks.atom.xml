@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic - Tips and Tricks</title><link href="https://mikhas.github.io/blog/" rel="alternate"></link><link href="https://mikhas.github.io/blog/feeds/tips-and-tricks.atom.xml" rel="self"></link><id>https://mikhas.github.io/blog/</id><updated>2024-08-27T00:00:00+02:00</updated><entry><title>Overcoming QML's restriction of trivially constructable types</title><link href="https://mikhas.github.io/blog/overcoming-trivial-constructable-types.html" rel="alternate"></link><published>2024-08-27T00:00:00+02:00</published><updated>2024-08-27T00:00:00+02:00</updated><author><name>Michael Hasselmann</name></author><id>tag:mikhas.github.io,2024-08-27:/blog/overcoming-trivial-constructable-types.html</id><summary type="html">&lt;p class="first last"&gt;Using an adapted Factory pattern, we can overcome the restrictions
+imposed by QML's declarative syntax to have trivially constructable
+types.&lt;/p&gt;
+</summary><content type="html">
+&lt;div class="section" id="problem-statement"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Problem Statement&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We already learned &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt; that as a consequence of how new types are defined, QML
+components have to be trivially constructable: Besides the hidden &lt;tt class="docutils literal"&gt;parent&lt;/tt&gt;
+parameter, no other parameter can be injected directly into the constructor.
+Instead, we have to use properties to set up the object.&lt;/p&gt;
+&lt;p&gt;Let's recap how we create object instances in QML:&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="nx"&gt;Derived&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;amount:&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
+    &lt;span class="k"&gt;iconSource:&lt;/span&gt; &lt;span class="s2"&gt;"other/path/to/icon.png"&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;But what if &lt;tt class="docutils literal"&gt;Derived&lt;/tt&gt; was a Python class, defined in our backend? Then the
+restricton on trivial constructors can be annoying. After all, dependency
+injection through constructor parameters &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt; is a versatile design pattern.&lt;/p&gt;
+&lt;p&gt;So how can we have our cake and eat it too?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="factory-methods-and-singletons"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;Factory Methods and Singletons&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Factories? Singletons? Probably not the cake we asked for, but it's arguably
+the best trade-off available in this situation.&lt;/p&gt;
+&lt;p&gt;QML mainly interacts with backend objects through properties and slots. Slots
+make Python methods directly callable for QML. Here's how:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nd"&gt;@Slot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;type0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;type1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;typeN&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;callMe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;param0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;type0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;param1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;type1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;typeN&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+     &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Then in QML, we could have for instance:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;otherProp:&lt;/span&gt; &lt;span class="nx"&gt;MyObject&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+&lt;span class="k"&gt;someProp:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;otherProp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;callMe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;arg0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;arg1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;...);&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;It's easy to see how inside the slot, we could construct a new object and
+return that instead. Nothing of how slots work in PySide6 prevents us from
+doing that. But we'll need a separate class to store the slot method. That's
+where the factory pattern comes in. Here, it's simply another &lt;tt class="docutils literal"&gt;QObject&lt;/tt&gt;-based
+type:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="ln"&gt;1 &lt;/span&gt;&lt;span class="nd"&gt;@QmlElement&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;2 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nd"&gt;@QmlSingleton&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;3 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Factory&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;4 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="nd"&gt;@Slot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;5 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;makeDerived&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;icon_source&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;6 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;icon_source&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;We only need one factory instance, so we might as well turn it into a
+singleton, from QML's perspective. The &lt;tt class="docutils literal"&gt;QmlSingleton&lt;/tt&gt; decorator &lt;a class="footnote-reference" href="#footnote-3" id="footnote-reference-3"&gt;[3]&lt;/a&gt; does
+just that but it'll only work if we don't provide our own &lt;tt class="docutils literal"&gt;__init__()&lt;/tt&gt; method
+for the factory.&lt;/p&gt;
+&lt;p&gt;The QML singleton simplifies the factory usage on the QML side, as we don't
+need to create a factory instance ourselves:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nx"&gt;readonly&lt;/span&gt; &lt;span class="nx"&gt;property&lt;/span&gt; &lt;span class="nx"&gt;Derived&lt;/span&gt; &lt;span class="k"&gt;derived:&lt;/span&gt; &lt;span class="nx"&gt;Factory&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;makeDerived&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"path/to/icon.png"&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="admonition note"&gt;
+&lt;p class="first admonition-title"&gt;Note&lt;/p&gt;
+&lt;p class="last"&gt;The right side of a property binding in QML is a JavaScript expression. So
+whenever we need to write some imperative code, we make a new property and
+bind a JavaScript code block to it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Here's the complete implemention of the factory and the &lt;tt class="docutils literal"&gt;Derived&lt;/tt&gt; class in Python:&lt;/p&gt;
+&lt;pre class="code python literal-block"&gt;
+&lt;span class="ln"&gt; 1 &lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;PySide6.QtCore&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Property&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Qt&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Signal&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Slot&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 2 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;PySide6.QtQml&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;QmlElement&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QmlSingleton&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 3 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 4 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="n"&gt;QML_IMPORT_NAME&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;"MyApp.Tools"&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 5 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="n"&gt;QML_IMPORT_MAJOR_VERSION&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 6 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 7 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 8 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nd"&gt;@QmlElement&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt; 9 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;10 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="n"&gt;iconSourceChanged&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Signal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;11 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="n"&gt;amountChanged&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Signal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;12 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;13 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;icon_source&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;QObject&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;14 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="nb"&gt;super&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;15 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_icon_source&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;icon_source&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;16 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_amount&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;17 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;18 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="nd"&gt;@Property&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;notify&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;iconSourceChanged&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;19 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;iconSource&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;20 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_icon_source&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;21 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;22 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="nd"&gt;@Property&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;notify&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;amountChanged&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;23 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;amount&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;24 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_amount&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;25 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;26 &lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;27 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nd"&gt;@QmlElement&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;28 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nd"&gt;@QmlSingleton&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;29 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Factory&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;30 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# By introducing optional parameters, we've created an overloaded method&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;31 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# issue that the QML engine cannot resolve unless we define `@Slot`&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;32 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="c1"&gt;# decorators for each case.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;33 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="nd"&gt;@Slot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;34 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="nd"&gt;@Slot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;QObject&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;35 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;makeDerived&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;36 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;icon_source&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;QObject&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;37 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;    &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;38 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="c1"&gt;# We need to decide on an owner, not just for the QML engine.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;39 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="c1"&gt;# Otherwise, we risk that the instance we want to return will&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;40 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="c1"&gt;# immediately be cleaned up by Python's garbage collector.&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;41 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="n"&gt;owner&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;parent&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;parent&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="ln"&gt;42 &lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;Derived&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;icon_source&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;owner&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;And here's how we can make use of them in QML:&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="ln"&gt; 1 &lt;/span&gt;&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;QtQuick&lt;/span&gt;
+&lt;span class="ln"&gt; 2 &lt;/span&gt;&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;QtQuick&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Controls&lt;/span&gt;
+&lt;span class="ln"&gt; 3 &lt;/span&gt;&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;MyApp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Tools&lt;/span&gt; &lt;span class="nx"&gt;as&lt;/span&gt; &lt;span class="nx"&gt;Tools&lt;/span&gt;
+&lt;span class="ln"&gt; 4 &lt;/span&gt;
+&lt;span class="ln"&gt; 5 &lt;/span&gt;
+&lt;span class="ln"&gt; 6 &lt;/span&gt;&lt;span class="nx"&gt;ApplicationWindow&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="ln"&gt; 7 &lt;/span&gt;    &lt;span class="kd"&gt;id: root&lt;/span&gt;
+&lt;span class="ln"&gt; 8 &lt;/span&gt;
+&lt;span class="ln"&gt; 9 &lt;/span&gt;    &lt;span class="nx"&gt;readonly&lt;/span&gt; &lt;span class="nx"&gt;property&lt;/span&gt; &lt;span class="nx"&gt;Tools&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Derived&lt;/span&gt; &lt;span class="k"&gt;derived:&lt;/span&gt; &lt;span class="nx"&gt;Tools&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Factory&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;makeDerived&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="ln"&gt;10 &lt;/span&gt;        &lt;span class="nx"&gt;Qt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;resolvedUrl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"path/to/icon.png"&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
+&lt;span class="ln"&gt;11 &lt;/span&gt;    &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="ln"&gt;12 &lt;/span&gt;
+&lt;span class="ln"&gt;13 &lt;/span&gt;    &lt;span class="k"&gt;title:&lt;/span&gt; &lt;span class="s2"&gt;"My Little Application"&lt;/span&gt;
+&lt;span class="ln"&gt;14 &lt;/span&gt;    &lt;span class="k"&gt;width:&lt;/span&gt; &lt;span class="mi"&gt;1280&lt;/span&gt;
+&lt;span class="ln"&gt;15 &lt;/span&gt;    &lt;span class="k"&gt;height:&lt;/span&gt; &lt;span class="mi"&gt;800&lt;/span&gt;
+&lt;span class="ln"&gt;16 &lt;/span&gt;    &lt;span class="k"&gt;visible:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+&lt;span class="ln"&gt;17 &lt;/span&gt;
+&lt;span class="ln"&gt;18 &lt;/span&gt;    &lt;span class="nx"&gt;Flow&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="ln"&gt;19 &lt;/span&gt;        &lt;span class="k"&gt;anchors.centerIn:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;
+&lt;span class="ln"&gt;20 &lt;/span&gt;        &lt;span class="k"&gt;flow:&lt;/span&gt; &lt;span class="nx"&gt;Flow&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;TopToBottom&lt;/span&gt;
+&lt;span class="ln"&gt;21 &lt;/span&gt;
+&lt;span class="ln"&gt;22 &lt;/span&gt;        &lt;span class="nx"&gt;Text&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="ln"&gt;23 &lt;/span&gt;            &lt;span class="k"&gt;font.pointSize:&lt;/span&gt; &lt;span class="mi"&gt;18&lt;/span&gt;
+&lt;span class="ln"&gt;24 &lt;/span&gt;            &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="k"&gt;root.derived.amount:&lt;/span&gt; &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;derived&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;amount&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;
+&lt;span class="ln"&gt;25 &lt;/span&gt;        &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="ln"&gt;26 &lt;/span&gt;        &lt;span class="nx"&gt;Text&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="ln"&gt;27 &lt;/span&gt;            &lt;span class="k"&gt;font.pointSize:&lt;/span&gt; &lt;span class="mi"&gt;18&lt;/span&gt;
+&lt;span class="ln"&gt;28 &lt;/span&gt;            &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="k"&gt;root.derived.iconSource:&lt;/span&gt; &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;derived&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;iconSource&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;
+&lt;span class="ln"&gt;29 &lt;/span&gt;        &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="ln"&gt;30 &lt;/span&gt;    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="ln"&gt;31 &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Functionally, the declaratively created instance in the beginning of the
+article and the &lt;tt class="docutils literal"&gt;Derived&lt;/tt&gt; instance we got from the factory are the same! Both
+instances also got created by the QML engine, so they'll live within the same
+thread.&lt;/p&gt;
+&lt;p&gt;Where the former was a pure QML type however, the latter offers us additional
+control and implemention flexibility through the Python backend.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;References&lt;/a&gt;&lt;/h2&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-1" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="multi-phase-construction"&gt;How objects are constructed and set up in QML&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-2" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://arjancodes.com/blog/python-dependency-injection-best-practices/#constructor-injection"&gt;Constructor-based dependency injection&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-3" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-3"&gt;[3]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://pages-test.qt.io/qtforpython-6/PySide6/QtQml/QmlSingleton.html"&gt;QmlSingleton decorator&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+</content><category term="Tips and Tricks"></category><category term="QML"></category><category term="PySide6"></category><category term="Design Pattern"></category></entry></feed>
