@@ -99,7 +99,7 @@
 components have to be trivially constructable: Besides the hidden <tt class="docutils literal">parent</tt>
 parameter, no other parameter can be injected directly into the constructor.
 Instead, we have to use properties to set up the object.</p>
-<p>Let's recap how we create object instances in QML:</p>
+<p>Let's recap object instantiation in QML:</p>
 <pre class="code qml literal-block">
 <span class="nx">Derived</span> <span class="p">{</span>
     <span class="k">amount:</span> <span class="mi">5</span>
@@ -107,8 +107,12 @@ Instead, we have to use properties to set up the object.</p>
 <span class="p">}</span>
 </pre>
 <p>But what if <tt class="docutils literal">Derived</tt> was a Python class, defined in our backend? Then the
-restricton on trivial constructors can be annoying. After all, dependency
-injection through constructor parameters <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a> is a versatile design pattern.</p>
+restriction on trivial constructors would quickly become annoying. After all,
+dependency injection through constructor parameters <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a> is a versatile design
+pattern.</p>
+<p>On top, there is a functional difference between waiting for property
+evaluation before the object is fully usuable and having immediately useful
+objects right after construction, and sometimes, we really need the latter.</p>
 <p>So how can we have our cake and eat it too?</p>
 </div>
 <div class="section" id="factory-methods-and-singletons">
@@ -223,26 +227,20 @@ bind a JavaScript code block to it.</p>
 <span class="ln">19 </span>        <span class="k">anchors.centerIn:</span> <span class="nx">parent</span>
 <span class="ln">20 </span>        <span class="k">flow:</span> <span class="nx">Flow</span><span class="p">.</span><span class="nx">TopToBottom</span>
 <span class="ln">21 </span>
-<span class="ln">22 </span>        <span class="nx">Text</span> <span class="p">{</span>
-<span class="ln">23 </span>            <span class="k">font.pointSize:</span> <span class="mi">18</span>
-<span class="ln">24 </span>            <span class="k">text:</span> <span class="err">`</span><span class="k">root.derived.amount:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">derived</span><span class="p">.</span><span class="nx">amount</span><span class="p">}</span><span class="err">`</span>
-<span class="ln">25 </span>        <span class="p">}</span>
-<span class="ln">26 </span>        <span class="nx">Text</span> <span class="p">{</span>
-<span class="ln">27 </span>            <span class="k">font.pointSize:</span> <span class="mi">18</span>
-<span class="ln">28 </span>            <span class="k">text:</span> <span class="err">`</span><span class="k">root.derived.iconSource:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">derived</span><span class="p">.</span><span class="nx">iconSource</span><span class="p">}</span><span class="err">`</span>
-<span class="ln">29 </span>        <span class="p">}</span>
-<span class="ln">30 </span>    <span class="p">}</span>
-<span class="ln">31 </span><span class="p">}</span>
+<span class="ln">22 </span>        <span class="nx">Text</span> <span class="p">{</span> <span class="k">text:</span> <span class="err">`</span><span class="k">root.derived.amount:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">derived</span><span class="p">.</span><span class="nx">amount</span><span class="p">}</span><span class="err">`</span> <span class="p">}</span>
+<span class="ln">23 </span>        <span class="nx">Text</span> <span class="p">{</span> <span class="k">text:</span> <span class="err">`</span><span class="k">root.derived.iconSource:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">derived</span><span class="p">.</span><span class="nx">iconSource</span><span class="p">}</span><span class="err">`</span> <span class="p">}</span>
+<span class="ln">24 </span>    <span class="p">}</span>
+<span class="ln">25 </span><span class="p">}</span>
 </pre>
 </div>
 <div class="section" id="conclusion">
 <h2><a class="toc-backref" href="#toc-entry-3">Conclusion</a></h2>
-<p>Functionally, the declaratively created instance in the beginning of the
-article and the <tt class="docutils literal">Derived</tt> instance we got from the factory are the same! Both
-instances also got created by the QML engine, so they'll live within the same
-thread.</p>
-<p>Where the former was a pure QML type however, the latter offers us additional
-control and implemention flexibility through the Python backend.</p>
+<p>In terms of use, both the declaratively created instance in the beginning of
+the article and the <tt class="docutils literal">Derived</tt> instance we got from the factory are similar.
+Both instances also got created by the QML engine, so they'll live within the
+same thread.</p>
+<p>Where the former was defined as a pure QML type however, the latter offers us
+additional control and implementation flexibility through the Python backend.</p>
 </div>
 <div class="section" id="references">
 <h2><a class="toc-backref" href="#toc-entry-4">References</a></h2>
@@ -255,7 +253,7 @@ control and implemention flexibility through the Python backend.</p>
 <table class="docutils footnote" frame="void" id="footnote-2" rules="none">
 <colgroup><col class="label"/><col/></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#footnote-reference-2">[2]</a></td><td><a class="reference external" href="https://arjancodes.com/blog/python-dependency-injection-best-practices/#constructor-injection">Constructor-based dependency injection</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-2">[2]</a></td><td><a class="reference external" href="https://en.wikipedia.org/wiki/Dependency_injection#Constructor_injection">Constructor-based dependency injection</a></td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="footnote-3" rules="none">

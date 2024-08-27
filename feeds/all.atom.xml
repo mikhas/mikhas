@@ -9,7 +9,7 @@ types.&lt;/p&gt;
 components have to be trivially constructable: Besides the hidden &lt;tt class="docutils literal"&gt;parent&lt;/tt&gt;
 parameter, no other parameter can be injected directly into the constructor.
 Instead, we have to use properties to set up the object.&lt;/p&gt;
-&lt;p&gt;Let's recap how we create object instances in QML:&lt;/p&gt;
+&lt;p&gt;Let's recap object instantiation in QML:&lt;/p&gt;
 &lt;pre class="code qml literal-block"&gt;
 &lt;span class="nx"&gt;Derived&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="k"&gt;amount:&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
@@ -17,8 +17,12 @@ Instead, we have to use properties to set up the object.&lt;/p&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;
 &lt;p&gt;But what if &lt;tt class="docutils literal"&gt;Derived&lt;/tt&gt; was a Python class, defined in our backend? Then the
-restricton on trivial constructors can be annoying. After all, dependency
-injection through constructor parameters &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt; is a versatile design pattern.&lt;/p&gt;
+restriction on trivial constructors would quickly become annoying. After all,
+dependency injection through constructor parameters &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt; is a versatile design
+pattern.&lt;/p&gt;
+&lt;p&gt;On top, there is a functional difference between waiting for property
+evaluation before the object is fully usuable and having immediately useful
+objects right after construction, and sometimes, we really need the latter.&lt;/p&gt;
 &lt;p&gt;So how can we have our cake and eat it too?&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="factory-methods-and-singletons"&gt;
@@ -133,26 +137,20 @@ bind a JavaScript code block to it.&lt;/p&gt;
 &lt;span class="ln"&gt;19 &lt;/span&gt;        &lt;span class="k"&gt;anchors.centerIn:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;
 &lt;span class="ln"&gt;20 &lt;/span&gt;        &lt;span class="k"&gt;flow:&lt;/span&gt; &lt;span class="nx"&gt;Flow&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;TopToBottom&lt;/span&gt;
 &lt;span class="ln"&gt;21 &lt;/span&gt;
-&lt;span class="ln"&gt;22 &lt;/span&gt;        &lt;span class="nx"&gt;Text&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="ln"&gt;23 &lt;/span&gt;            &lt;span class="k"&gt;font.pointSize:&lt;/span&gt; &lt;span class="mi"&gt;18&lt;/span&gt;
-&lt;span class="ln"&gt;24 &lt;/span&gt;            &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="k"&gt;root.derived.amount:&lt;/span&gt; &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;derived&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;amount&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;
-&lt;span class="ln"&gt;25 &lt;/span&gt;        &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="ln"&gt;26 &lt;/span&gt;        &lt;span class="nx"&gt;Text&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="ln"&gt;27 &lt;/span&gt;            &lt;span class="k"&gt;font.pointSize:&lt;/span&gt; &lt;span class="mi"&gt;18&lt;/span&gt;
-&lt;span class="ln"&gt;28 &lt;/span&gt;            &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="k"&gt;root.derived.iconSource:&lt;/span&gt; &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;derived&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;iconSource&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;
-&lt;span class="ln"&gt;29 &lt;/span&gt;        &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="ln"&gt;30 &lt;/span&gt;    &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;span class="ln"&gt;31 &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="ln"&gt;22 &lt;/span&gt;        &lt;span class="nx"&gt;Text&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="k"&gt;root.derived.amount:&lt;/span&gt; &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;derived&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;amount&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="ln"&gt;23 &lt;/span&gt;        &lt;span class="nx"&gt;Text&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="k"&gt;root.derived.iconSource:&lt;/span&gt; &lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;derived&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;iconSource&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="ln"&gt;24 &lt;/span&gt;    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="ln"&gt;25 &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;
 &lt;/div&gt;
 &lt;div class="section" id="conclusion"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;Functionally, the declaratively created instance in the beginning of the
-article and the &lt;tt class="docutils literal"&gt;Derived&lt;/tt&gt; instance we got from the factory are the same! Both
-instances also got created by the QML engine, so they'll live within the same
-thread.&lt;/p&gt;
-&lt;p&gt;Where the former was a pure QML type however, the latter offers us additional
-control and implemention flexibility through the Python backend.&lt;/p&gt;
+&lt;p&gt;In terms of use, both the declaratively created instance in the beginning of
+the article and the &lt;tt class="docutils literal"&gt;Derived&lt;/tt&gt; instance we got from the factory are similar.
+Both instances also got created by the QML engine, so they'll live within the
+same thread.&lt;/p&gt;
+&lt;p&gt;Where the former was defined as a pure QML type however, the latter offers us
+additional control and implementation flexibility through the Python backend.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="references"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;References&lt;/a&gt;&lt;/h2&gt;
@@ -165,7 +163,7 @@ control and implemention flexibility through the Python backend.&lt;/p&gt;
 &lt;table class="docutils footnote" frame="void" id="footnote-2" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://arjancodes.com/blog/python-dependency-injection-best-practices/#constructor-injection"&gt;Constructor-based dependency injection&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Dependency_injection#Constructor_injection"&gt;Constructor-based dependency injection&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;table class="docutils footnote" frame="void" id="footnote-3" rules="none"&gt;
