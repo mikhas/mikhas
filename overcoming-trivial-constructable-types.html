@@ -210,27 +210,28 @@ bind a JavaScript code block to it.</p>
 <span class="ln"> 2 </span><span class="kr">import</span> <span class="nx">QtQuick</span><span class="p">.</span><span class="nx">Controls</span>
 <span class="ln"> 3 </span><span class="kr">import</span> <span class="nx">MyApp</span><span class="p">.</span><span class="nx">Tools</span> <span class="nx">as</span> <span class="nx">Tools</span>
 <span class="ln"> 4 </span>
-<span class="ln"> 5 </span>
-<span class="ln"> 6 </span><span class="nx">ApplicationWindow</span> <span class="p">{</span>
-<span class="ln"> 7 </span>    <span class="kd">id: root</span>
-<span class="ln"> 8 </span>
-<span class="ln"> 9 </span>    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">Tools</span><span class="p">.</span><span class="nx">Derived</span> <span class="k">derived:</span> <span class="nx">Tools</span><span class="p">.</span><span class="nx">Factory</span><span class="p">.</span><span class="nx">makeDerived</span><span class="p">(</span>
-<span class="ln">10 </span>        <span class="nx">Qt</span><span class="p">.</span><span class="nx">resolvedUrl</span><span class="p">(</span><span class="s2">"path/to/icon.png"</span><span class="p">),</span> <span class="mi">5</span>
-<span class="ln">11 </span>    <span class="p">)</span>
-<span class="ln">12 </span>
-<span class="ln">13 </span>    <span class="k">title:</span> <span class="s2">"My Little Application"</span>
-<span class="ln">14 </span>    <span class="k">width:</span> <span class="mi">1280</span>
-<span class="ln">15 </span>    <span class="k">height:</span> <span class="mi">800</span>
-<span class="ln">16 </span>    <span class="k">visible:</span> <span class="kc">true</span>
-<span class="ln">17 </span>
-<span class="ln">18 </span>    <span class="nx">Flow</span> <span class="p">{</span>
-<span class="ln">19 </span>        <span class="k">anchors.centerIn:</span> <span class="nx">parent</span>
-<span class="ln">20 </span>        <span class="k">flow:</span> <span class="nx">Flow</span><span class="p">.</span><span class="nx">TopToBottom</span>
-<span class="ln">21 </span>
-<span class="ln">22 </span>        <span class="nx">Text</span> <span class="p">{</span> <span class="k">text:</span> <span class="err">`</span><span class="k">root.derived.amount:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">derived</span><span class="p">.</span><span class="nx">amount</span><span class="p">}</span><span class="err">`</span> <span class="p">}</span>
-<span class="ln">23 </span>        <span class="nx">Text</span> <span class="p">{</span> <span class="k">text:</span> <span class="err">`</span><span class="k">root.derived.iconSource:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">derived</span><span class="p">.</span><span class="nx">iconSource</span><span class="p">}</span><span class="err">`</span> <span class="p">}</span>
-<span class="ln">24 </span>    <span class="p">}</span>
-<span class="ln">25 </span><span class="p">}</span>
+<span class="ln"> 5 </span><span class="nx">ApplicationWindow</span> <span class="p">{</span>
+<span class="ln"> 6 </span>    <span class="kd">id: root</span>
+<span class="ln"> 7 </span>
+<span class="ln"> 8 </span>    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">Tools</span><span class="p">.</span><span class="nx">Derived</span> <span class="k">derived:</span> <span class="nx">Tools</span><span class="p">.</span><span class="nx">Factory</span><span class="p">.</span><span class="nx">makeDerived</span><span class="p">(</span><span class="nx">Qt</span><span class="p">.</span><span class="nx">resolvedUrl</span><span class="p">(</span><span class="s2">"path/to/icon.png"</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+<span class="ln"> 9 </span>
+<span class="ln">10 </span>    <span class="k">title:</span> <span class="s2">"My Little Application"</span>
+<span class="ln">11 </span>    <span class="k">width:</span> <span class="mi">1280</span>
+<span class="ln">12 </span>    <span class="k">height:</span> <span class="mi">800</span>
+<span class="ln">13 </span>    <span class="k">visible:</span> <span class="kc">true</span>
+<span class="ln">14 </span>
+<span class="ln">15 </span>    <span class="nx">Flow</span> <span class="p">{</span>
+<span class="ln">16 </span>        <span class="k">anchors.centerIn:</span> <span class="nx">parent</span>
+<span class="ln">17 </span>        <span class="k">flow:</span> <span class="nx">Flow</span><span class="p">.</span><span class="nx">TopToBottom</span>
+<span class="ln">18 </span>
+<span class="ln">19 </span>        <span class="nx">Text</span> <span class="p">{</span>
+<span class="ln">20 </span>            <span class="k">text:</span> <span class="err">`</span><span class="k">root.derived.amount:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">derived</span><span class="p">.</span><span class="nx">amount</span><span class="p">}</span><span class="err">`</span>
+<span class="ln">21 </span>        <span class="p">}</span>
+<span class="ln">22 </span>        <span class="nx">Text</span> <span class="p">{</span>
+<span class="ln">23 </span>            <span class="k">text:</span> <span class="err">`</span><span class="k">root.derived.iconSource:</span> <span class="nx">$</span><span class="p">{</span><span class="nx">root</span><span class="p">.</span><span class="nx">derived</span><span class="p">.</span><span class="nx">iconSource</span><span class="p">}</span><span class="err">`</span>
+<span class="ln">24 </span>        <span class="p">}</span>
+<span class="ln">25 </span>    <span class="p">}</span>
+<span class="ln">26 </span><span class="p">}</span>
 </pre>
 </div>
 <div class="section" id="conclusion">
@@ -295,7 +296,7 @@ backend.</p>
                     <span class="superscript">2</span>
 </a></li>
                 <li><a href="https://mikhas.github.io/blog/tags.html#qml-ref">QML
-                    <span class="superscript">3</span>
+                    <span class="superscript">4</span>
 </a></li>
             </ul>
 <h4>Contact</h4>
@@ -395,7 +396,7 @@ backend.</p>
 <footer>
 
 
-
+    <div>&copy; 2024 Michael Hasselmann</div>
 
 </footer>            <script src="https://mikhas.github.io/blog/theme/js/elegant.prod.9e9d5ce754.js"></script>
 
