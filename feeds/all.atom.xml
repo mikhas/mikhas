@@ -229,7 +229,7 @@ separate action instances.&lt;/p&gt;
 &lt;div class="section" id="introducing-the-action-decorator"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-7"&gt;Introducing: The Action Decorator&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Decorators &lt;a class="footnote-reference" href="#footnote-4" id="footnote-reference-4"&gt;[4]&lt;/a&gt; are powerful and well-known to Python developers. The principle
-of using and outer and inner function -- or in our case, action -- chained
+of using an outer and inner function -- or in our case, action -- chained
 together, is exactly how we fixed our bug. To support the general case, we need
 to wrap the complete Action API like so:&lt;/p&gt;
 &lt;pre class="code qml literal-block"&gt;
