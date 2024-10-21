@@ -70,9 +70,6 @@ is no obvious solution to that problem, as there is no simple way to add a
 payload or similar. It's also not a surprise: &lt;tt class="docutils literal"&gt;Action.onTriggered&lt;/tt&gt; is very
 much a prepared slot, meaning everything has be to ready before the user clicks
 that button.&lt;/p&gt;
-&lt;p&gt;We'll use a &lt;tt class="docutils literal"&gt;GridView&lt;/tt&gt; example that is powered by a proper
-&lt;tt class="docutils literal"&gt;QAbstractItemModel&lt;/tt&gt; to construct a problem around the handling of the view's
-&lt;tt class="docutils literal"&gt;currentIndex&lt;/tt&gt; property to make the above problem apparent.&lt;/p&gt;
 &lt;div class="section" id="the-problematic-example"&gt;
 &lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;The Problematic Example&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;We have an &lt;tt class="docutils literal"&gt;UI.ItemsView&lt;/tt&gt; that allows to browse the items provided by
@@ -181,7 +178,7 @@ the potential issue. But in our case, there are three actions. Given two items
 &lt;p&gt;Because &lt;cite&gt;B&lt;/cite&gt; is selected, the last action affects the wrong item. We could have
 chosen a different design that would circumvent the issue at hand, but let's
 assume there are some benefits to this design, and that it was a conscious
-choice. Luckily, the fix is also obvious now: Any of the item-bound action
+choice. Luckily, the fix is also obvious now: Any of the item-bound actions
 needs to somehow select the proper item just in time.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="bug-fix-attempt-1"&gt;
@@ -203,7 +200,7 @@ the &lt;tt class="docutils literal"&gt;currentIndex&lt;/tt&gt;. This will run on
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Firstly, this code is wrong in a very surprising way: Each &lt;tt class="docutils literal"&gt;Connections&lt;/tt&gt;
 instance in the view will now fire if one button is pressed, as the passed
-actions have pointer symantics. In a view that shows 30 tiles, one button click
+actions have reference symantics &lt;a class="footnote-reference" href="#footnote-4" id="footnote-reference-4"&gt;[4]&lt;/a&gt;. In a view that shows 30 tiles, one button click
 triggers 30 function calls as there are 30 &lt;tt class="docutils literal"&gt;Connections&lt;/tt&gt;.&lt;/p&gt;
 &lt;p&gt;Secondly, even if it worked, we have no guarantee that &lt;tt class="docutils literal"&gt;currentIndex&lt;/tt&gt; would
 be updated before the action's payload, as the execution order of multiple
@@ -228,7 +225,7 @@ separate action instances.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="introducing-the-action-decorator"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-7"&gt;Introducing: The Action Decorator&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;Decorators &lt;a class="footnote-reference" href="#footnote-4" id="footnote-reference-4"&gt;[4]&lt;/a&gt; are powerful and well-known to Python developers. The principle
+&lt;p&gt;Decorators &lt;a class="footnote-reference" href="#footnote-5" id="footnote-reference-5"&gt;[5]&lt;/a&gt; are powerful and well-known to Python developers. The principle
 of using an outer and inner function -- or in our case, action -- chained
 together, is exactly how we fixed our bug. To support the general case, we need
 to wrap the complete Action API like so:&lt;/p&gt;
@@ -239,14 +236,13 @@ to wrap the complete Action API like so:&lt;/p&gt;
 
     &lt;span class="nx"&gt;required&lt;/span&gt; &lt;span class="nx"&gt;property&lt;/span&gt; &lt;span class="nx"&gt;Action&lt;/span&gt; &lt;span class="nx"&gt;action&lt;/span&gt;
 
-    &lt;span class="k"&gt;checkable:&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;checkable&lt;/span&gt;
-    &lt;span class="k"&gt;checked:&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;checked&lt;/span&gt;
-    &lt;span class="k"&gt;enabled:&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;enabled&lt;/span&gt;
-    &lt;span class="k"&gt;icon:&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;icon&lt;/span&gt;
-    &lt;span class="k"&gt;shortcut:&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;shortcut&lt;/span&gt;
-    &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;text&lt;/span&gt;
-    &lt;span class="c1"&gt;// Delays this slot to run _after_ inner action's `onTriggered` slot.
-&lt;/span&gt;    &lt;span class="k"&gt;onTriggered:&lt;/span&gt; &lt;span class="nx"&gt;Qt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;callLater&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;trigger&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;checkable:&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;checkable&lt;/span&gt;
+    &lt;span class="k"&gt;checked:&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;checked&lt;/span&gt;
+    &lt;span class="k"&gt;enabled:&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;enabled&lt;/span&gt;
+    &lt;span class="k"&gt;icon:&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;icon&lt;/span&gt;
+    &lt;span class="k"&gt;shortcut:&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;shortcut&lt;/span&gt;
+    &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;text&lt;/span&gt;
+    &lt;span class="k"&gt;onTriggered:&lt;/span&gt; &lt;span class="nx"&gt;Qt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;callLater&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;action&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;trigger&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;
 &lt;p&gt;Here, &lt;tt class="docutils literal"&gt;Qt.callLater()&lt;/tt&gt; is used to reorder execution so that the inner action
@@ -299,7 +295,13 @@ decorators.&lt;/p&gt;
 &lt;table class="docutils footnote" frame="void" id="footnote-4" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
-&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-4"&gt;[4]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://book.pythontips.com/en/latest/decorators.html"&gt;Decorators in Python&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-4"&gt;[4]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://hackingcpp.com/cs/value_vs_reference_semantics.html"&gt;Value Semantics vs. Reference Semantics&lt;/a&gt;, with examples in C++ and Python&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-5" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-5"&gt;[5]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://book.pythontips.com/en/latest/decorators.html"&gt;Decorators in Python&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
