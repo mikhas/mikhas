@@ -1,98 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="https://quitemeticulouslogic.com/theme/css/elegant.prod.9e9d5ce754.css" media="screen">
-        <link rel="stylesheet" type="text/css" href="https://quitemeticulouslogic.com/theme/css/custom.css" media="screen">
-        <link rel="stylesheet" type="text/css" href="https://quitemeticulouslogic.com/theme/css/pygments.css" media="screen">
+<head>
+	<!-- Basic Metas -->
+	<meta charset="utf-8">
+	<title>How objects are constructed in QML | Quite Meticulous Logic</title>
+	<meta name="description" content="Making a new type Here's how you derive a new class from a base class in pure QML, with a public API of two mandatory properties. They fill the role of constructor parameters: import QtQuick QtObject { required property int amount required property url iconSource } The name of the new class …">
+	<meta name="author" content="">
+	<link rel="author" href=""/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        <link rel="dns-prefetch" href="//fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+	<!-- Twitter Cards and Open Graph -->
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:creator" content="">
+	<meta name="twitter:domain" content="">
+	<meta name="twitter:site" content="">
+	<meta property="og:title" content="How objects are constructed in QML">
+	<meta property="og:description" content="Making a new type Here's how you derive a new class from a base class in pure QML, with a public API of two mandatory properties. They fill the role of constructor parameters: import QtQuick QtObject { required property int amount required property url iconSource } The name of the new class …">
+	<meta property="og:image" content="https://quitemeticulouslogic.com/images/arch.jpeg">
+	<meta property="og:type" content="article">
+	<meta property="og:url" content="https://quitemeticulouslogic.com/multi-phase-construction.html">
 
-        <meta name="author" content="Michael Hasselmann" />
+	<!-- Stylesheets and Web Fonts -->
+	<link href="/theme/style.min.css?b03dfe38" rel="stylesheet">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-        <meta property="og:type" content="article" />
-        <meta name="twitter:card" content="summary">
+	<!-- Favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="//apple-touch-icon.png">
+	<link rel="icon" type="image/png" href="//favicon-16x16.png" sizes="16x16">
+	<link rel="icon" type="image/png" href="//favicon-32x32.png" sizes="32x32">
+	<meta name="theme-color" content="">
 
-<meta name="keywords" content="QML, Starter Kit, " />
+	<meta name="msapplication-TileColor" content="">
+	<meta name="msapplication-TileImage" content="//mstile-144x144.png">
+	<meta name="msapplication-square70x70logo" content="//mstile-small.png">
+	<meta name="msapplication-square150x150logo" content="//mstile-medium.png">
+	<meta name="msapplication-wide310x150logo" content="//mstile-wide.png">
+	<meta name="msapplication-square310x310logo" content="//mstile-large.png">
 
-<meta property="og:title" content="How objects are constructed and set up in QML "/>
-<meta property="og:url" content="https://quitemeticulouslogic.com/multi-phase-construction.html" />
-<meta property="og:description" content="A brief introduction to making custom types in QML, and how the multi-phase object construction works in practice." />
-<meta property="og:site_name" content="Quite Meticulous Logic" />
-<meta property="og:article:author" content="Michael Hasselmann" />
-<meta property="og:article:published_time" content="2024-08-20T00:00:00+02:00" />
-<meta property="og:article:modified_time" content="2024-08-24T00:00:00+02:00" />
-<meta name="twitter:title" content="How objects are constructed and set up in QML ">
-<meta name="twitter:description" content="A brief introduction to making custom types in QML, and how the multi-phase object construction works in practice.">
+	<!--[if lt IE 9]>
+	<script src="/theme/js/html5shiv.min.js"></script>
+	<script src="/theme/js/respond.min.js"></script>
+	<![endif]-->
+</head>
 
-        <title>How objects are constructed and set up in QML  · Quite Meticulous Logic
-</title>
-        <link href="https://quitemeticulouslogic.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Quite Meticulous Logic - Full Atom Feed" />
-
+<body>
+	<div class="container">
+		<aside>
+			<a href="/"><img id="avatar" alt="arch" src="/images/arch.jpeg"></a>
+			<div id="name"><a href="/">Quite Meticulous Logic</a></div>
+			<div id="bio">A blog about writing super tidy QML code, with a touch of model/view and Python on the side.</div>
 
 
-    </head>
-    <body>
-        <div id="content">
-            <div class="navbar navbar-static-top">
-                <div class="navbar-inner">
-                    <div class="container-fluid">
-                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </a>
-                        <a class="brand" href="https://quitemeticulouslogic.com/"><span class=site-name>Quite Meticulous Logic</span></a>
-                        <div class="nav-collapse collapse">
-                            <ul class="nav pull-right top-menu">
-                                <li >
-                                    <a href=
-                                       https://quitemeticulouslogic.com
-                                    >Home</a>
-                                </li>
-                                <li ><a href="https://quitemeticulouslogic.com/categories.html">Categories</a></li>
-                                <li ><a href="https://quitemeticulouslogic.com/tags.html">Tags</a></li>
-                                <li ><a href="https://quitemeticulouslogic.com/archives.html">Archives</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="container-fluid">
-                <div class="row-fluid">
-                    <div class="span1"></div>
-                    <div class="span10">
-<article itemscope>
-<div class="row-fluid">
-    <header class="page-header span10 offset2">
-        <h1>
-            <a href="https://quitemeticulouslogic.com/multi-phase-construction.html">
-                How objects are constructed and set up in QML
-            </a>
-        </h1>
-    </header>
-</div>
+			<div id="social">
+				<a href="https://github.com/mikhas" title="GitHub" class="icon fa fa-github"></a>
+				<a href="https://linkedin.com/in/michaelhasselmann" title="LinkedIn" class="icon fa fa-linkedin"></a>
+				<a href="/feeds/atom.xml" title="Atom Feed" class="icon fa fa-feed"></a>
+			</div>
 
-<div class="row-fluid">
-    <div class="span2 table-of-content">
-        <nav>
-        <h4>Contents</h4>
-        <div class="toc" id="">
-<p class="topic-title"><a class="reference internal" href="#top">Contents</a></p>
-<ul class="simple">
-<li><a class="reference internal" href="#making-a-new-type" id="toc-entry-1">Making a new type</a></li>
-<li><a class="reference internal" href="#multi-phase-construction" id="toc-entry-2">Multi-phase construction</a></li>
-<li><a class="reference internal" href="#recursive-construction" id="toc-entry-3">Recursive construction</a></li>
-</ul>
-</div>
-        </nav>
-    </div>
-    <div class="span8 article-content">
-            
-            
+			<hr id="sidebar-divider">
+		</aside>
+
+		<article>
+	<h1 class="title"><a href="/multi-phase-construction.html" title="Permalink to How objects are constructed in QML">How objects are constructed in QML</a></h1>
+	<time class="date" datetime="2024-08-20 00:00:00+02:00">Tue 20 August 2024</time>
+	<div class="content">
+		
 <div class="section" id="making-a-new-type">
 <h2><a class="toc-backref" href="#toc-entry-1">Making a new type</a></h2>
 <p>Here's how you derive a new class from a base class in pure QML, with a public
@@ -221,162 +193,21 @@ recursive construction spans all components nested within, with each component
 following the multi-phase construction process.</p>
 </div>
 
+	</div>
+
+	<div id="related-articles">
+		<a href="/overcoming-trivial-constructable-types.html" id="next-neighbour">&laquo; Overcoming trivially constructable types</a>
+		<a href="/launch-qml-from-python.html" id="prev-neighbour">Launching your QML application from Python &raquo;</a>
+	</div>
+
+			<hr>
+		</article>
+
+		<footer>
+			<p>&copy; 2024 Michael Hasselmann</p>
+		</footer>
+	</div>
 
 
-             
- 
-            
-            
-            
-
-
-
-
-
-
-
-            <hr/>
-        </div>
-        <section id="article-sidebar" class="span2">
-            <h4>Published</h4>
-            <time itemprop="dateCreated" datetime="2024-08-20T00:00:00+02:00">Tue 20 August 2024</time>
-<h4>Last Updated</h4>
-<time datetime="2024-08-24T00:00:00+02:00">Sat 24 August 2024</time>
-
-            <h4>Category</h4>
-            <a class="category-link" href="https://quitemeticulouslogic.com/categories.html#starter-kit-ref">Starter Kit</a>
-            <h4>Tags</h4>
-            <ul class="list-of-tags tags-in-article">
-                <li><a href="https://quitemeticulouslogic.com/tags.html#qml-ref">QML
-                    <span class="superscript">5</span>
-</a></li>
-            </ul>
-<h4>Contact</h4>
-<div id="sidebar-social-link">
-    <a href="https://linkedin.com/in/michaelhasselmann" title="" target="_blank" rel="nofollow noopener noreferrer">
-        <svg xmlns="http://www.w3.org/2000/svg" aria-label="LinkedIn" role="img" viewBox="0 0 512 512" fill="#fff"><rect width="512" height="512" rx="15%" fill="#0077b5"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg>
-    </a>
-    <a href="https://github.com/mikhas" title="" target="_blank" rel="nofollow noopener noreferrer">
-        <svg xmlns="http://www.w3.org/2000/svg" aria-label="GitHub" role="img" viewBox="0 0 512 512"><rect width="512" height="512" rx="15%" fill="#1B1817"/><path fill="#fff" d="M335 499c14 0 12 17 12 17H165s-2-17 12-17c13 0 16-6 16-12l-1-50c-71 16-86-28-86-28-12-30-28-37-28-37-24-16 1-16 1-16 26 2 40 26 40 26 22 39 59 28 74 22 2-17 9-28 16-35-57-6-116-28-116-126 0-28 10-51 26-69-3-6-11-32 3-67 0 0 21-7 70 26 42-12 86-12 128 0 49-33 70-26 70-26 14 35 6 61 3 67 16 18 26 41 26 69 0 98-60 120-117 126 10 8 18 24 18 48l-1 70c0 6 3 12 16 12z"/></svg>
-    </a>
-</div>
-            
-
-
-
-
-
-            
-
-
-
-
-
-        </section>
-</div>
-</article>
-<!-- Root element of PhotoSwipe. Must have class pswp. -->
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    <!-- Background of PhotoSwipe.
-         It's a separate element as animating opacity is faster than rgba(). -->
-    <div class="pswp__bg"></div>
-
-    <!-- Slides wrapper with overflow:hidden. -->
-    <div class="pswp__scroll-wrap">
-
-        <!-- Container that holds slides.
-            PhotoSwipe keeps only 3 of them in the DOM to save memory.
-            Don't modify these 3 pswp__item elements, data is added later on. -->
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                <!--  Controls are self-explanatory. Order can be changed. -->
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
-                <!-- element will get class pswp__preloader--active when preloader is running -->
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                      <div class="pswp__preloader__cut">
-                        <div class="pswp__preloader__donut"></div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>                    </div>
-                    <div class="span1"></div>
-                </div>
-            </div>
-        </div>
-<footer>
-
-
-    <div>&copy; 2024 Michael Hasselmann</div>
-
-</footer>            <script src="https://quitemeticulouslogic.com/theme/js/elegant.prod.9e9d5ce754.js"></script>
-
-    <script>
-    (function () {
-        if (window.location.hash.match(/^#comment-\d+$/)) {
-            $('#comment_thread').collapse('show');
-        }
-    })();
-    window.onhashchange=function(){
-        if (window.location.hash.match(/^#comment-\d+$/))
-            window.location.reload(true);
-    }
-    $('#comment_thread').on('shown', function () {
-        var link = document.getElementById('comment-accordion-toggle');
-        var old_innerHTML = link.innerHTML;
-        $(link).fadeOut(200, function() {
-            $(this).text('Click here to hide comments').fadeIn(200);
-        });
-        $('#comment_thread').on('hidden', function () {
-            $(link).fadeOut(200, function() {
-                $(this).text(old_innerHTML).fadeIn(200);
-            });
-        })
-    })
-</script>
-
-    </body>
-    <!-- Theme: Elegant built for Pelican
-        License : MIT -->
+</body>
 </html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Basic Metas -->
+	<meta charset="utf-8">
+	<title>Using QML Actions to decouple components | Quite Meticulous Logic</title>
+	<meta name="description" content="Problem statement Imagine a simple application with three pages and a toolbar to navigate between the pages. In QML, we can use a StackView [1] to display the pages, together with nice transition animations. Here's our Main.qml: ApplicationWindow { id: root title: "Using QML Actions to Decouple Components" width: 1280 …">
+	<meta name="author" content="">
+	<link rel="author" href=""/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<!-- Twitter Cards and Open Graph -->
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:creator" content="">
+	<meta name="twitter:domain" content="">
+	<meta name="twitter:site" content="">
+	<meta property="og:title" content="Using QML Actions to decouple components">
+	<meta property="og:description" content="Problem statement Imagine a simple application with three pages and a toolbar to navigate between the pages. In QML, we can use a StackView [1] to display the pages, together with nice transition animations. Here's our Main.qml: ApplicationWindow { id: root title: "Using QML Actions to Decouple Components" width: 1280 …">
+	<meta property="og:image" content="https://quitemeticulouslogic.com/images/arch.jpeg">
+	<meta property="og:type" content="article">
+	<meta property="og:url" content="https://quitemeticulouslogic.com/actions-decouple-components.html">
+
+	<!-- Stylesheets and Web Fonts -->
+	<link href="/theme/style.min.css?b03dfe38" rel="stylesheet">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+	<!-- Favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="//apple-touch-icon.png">
+	<link rel="icon" type="image/png" href="//favicon-16x16.png" sizes="16x16">
+	<link rel="icon" type="image/png" href="//favicon-32x32.png" sizes="32x32">
+	<meta name="theme-color" content="">
+
+	<meta name="msapplication-TileColor" content="">
+	<meta name="msapplication-TileImage" content="//mstile-144x144.png">
+	<meta name="msapplication-square70x70logo" content="//mstile-small.png">
+	<meta name="msapplication-square150x150logo" content="//mstile-medium.png">
+	<meta name="msapplication-wide310x150logo" content="//mstile-wide.png">
+	<meta name="msapplication-square310x310logo" content="//mstile-large.png">
+
+	<!--[if lt IE 9]>
+	<script src="/theme/js/html5shiv.min.js"></script>
+	<script src="/theme/js/respond.min.js"></script>
+	<![endif]-->
+</head>
+
+<body>
+	<div class="container">
+		<aside>
+			<a href="/"><img id="avatar" alt="arch" src="/images/arch.jpeg"></a>
+			<div id="name"><a href="/">Quite Meticulous Logic</a></div>
+			<div id="bio">A blog about writing super tidy QML code, with a touch of model/view and Python on the side.</div>
+
+
+			<div id="social">
+				<a href="https://github.com/mikhas" title="GitHub" class="icon fa fa-github"></a>
+				<a href="https://linkedin.com/in/michaelhasselmann" title="LinkedIn" class="icon fa fa-linkedin"></a>
+				<a href="/feeds/atom.xml" title="Atom Feed" class="icon fa fa-feed"></a>
+			</div>
+
+			<hr id="sidebar-divider">
+		</aside>
+
+		<article>
+	<h1 class="title"><a href="/actions-decouple-components.html" title="Permalink to Using QML Actions to decouple components">Using QML Actions to decouple components</a></h1>
+	<time class="date" datetime="2024-11-09 00:00:00+01:00">Sat 09 November 2024</time>
+	<div class="content">
+		
+<div class="section" id="problem-statement">
+<h2><a class="toc-backref" href="#toc-entry-1">Problem statement</a></h2>
+<p>Imagine a simple application with three pages and a toolbar to navigate between
+the pages. In QML, we can use a <tt class="docutils literal">StackView</tt> <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a> to display the pages,
+together with nice transition animations.</p>
+<p>Here's our <tt class="docutils literal">Main.qml</tt>:</p>
+<pre class="code qml literal-block">
+<span class="nx">ApplicationWindow</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="k">title:</span> <span class="s2">"Using QML Actions to Decouple Components"</span>
+    <span class="k">width:</span> <span class="mi">1280</span>
+    <span class="k">height:</span> <span class="mi">800</span>
+    <span class="k">visible:</span> <span class="kc">true</span>
+    <span class="k">menuBar:</span> <span class="nx">UI</span><span class="p">.</span><span class="nx">Toolbar</span> <span class="p">{</span> <span class="k">view:</span> <span class="nx">view</span> <span class="p">}</span>
+
+    <span class="nx">StackView</span> <span class="p">{</span>
+        <span class="kd">id: view</span>
+
+        <span class="k">anchors.fill:</span> <span class="nx">parent</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>And this is how it looks:</p>
+<img alt="" src="images/qml-actions/stackview-with-pages.png"/>
+<p>Simple enough, right? But you of course already guessed that all the
+heavy-lifting must done by the <tt class="docutils literal">UI.Toolbar</tt>:</p>
+<pre class="code qml literal-block">
+<span class="c1">// UI.Toolbar
+</span><span class="nx">Container</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="kd">function</span> <span class="nx">showPage</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">page</span><span class="p">,</span> <span class="nx">objectName</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+
+    <span class="nx">required</span> <span class="nx">property</span> <span class="nx">StackView</span> <span class="nx">view</span>
+    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">Component</span> <span class="k">browsePage:</span> <span class="nx">Page</span> <span class="p">{</span>
+        <span class="k">objectName:</span> <span class="s2">"browsePage"</span>
+        <span class="k">text:</span> <span class="s2">"Showing &lt;em&gt;Browse&lt;/em&gt; page"</span>
+    <span class="p">}</span>
+    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">Component</span> <span class="k">detailsPage:</span> <span class="nx">Page</span> <span class="p">{</span>
+        <span class="k">objectName:</span> <span class="s2">"detailsPage"</span>
+        <span class="k">text:</span> <span class="s2">"Showing &lt;em&gt;Details&lt;/em&gt; page"</span>
+    <span class="p">}</span>
+    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">Component</span> <span class="k">settingsPage:</span> <span class="nx">Page</span> <span class="p">{</span>
+        <span class="k">objectName:</span> <span class="s2">"settingsPage"</span>
+        <span class="k">text:</span> <span class="s2">"Showing &lt;em&gt;Settings&lt;/em&gt; page"</span>
+    <span class="p">}</span>
+
+    <span class="k">background:</span> <span class="nx">Rectangle</span> <span class="p">{</span> <span class="k">color:</span> <span class="s2">"lightgrey"</span> <span class="p">}</span>
+    <span class="k">contentItem:</span> <span class="nx">Row</span> <span class="p">{</span> <span class="k">spacing:</span> <span class="mi">8</span> <span class="p">}</span>
+
+    <span class="nx">Button</span> <span class="p">{</span>
+        <span class="k">text:</span> <span class="s2">"Browse"</span>
+        <span class="k">onClicked:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">showPage</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">view</span><span class="p">,</span> <span class="nx">root</span><span class="p">.</span><span class="nx">browsePage</span><span class="p">,</span> <span class="s2">"browsePage"</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nx">Button</span> <span class="p">{</span>
+        <span class="k">text:</span> <span class="s2">"View Details"</span>
+        <span class="k">onClicked:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">showPage</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">view</span><span class="p">,</span> <span class="nx">root</span><span class="p">.</span><span class="nx">detailsPage</span><span class="p">,</span> <span class="s2">"detailsPage"</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nx">Button</span> <span class="p">{</span>
+        <span class="k">text:</span> <span class="s2">"View Settings"</span>
+        <span class="k">onClicked:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">showPage</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">view</span><span class="p">,</span> <span class="nx">root</span><span class="p">.</span><span class="nx">settingsPage</span><span class="p">,</span> <span class="s2">"settingsPage"</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">Component.onCompleted:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">showPage</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">view</span><span class="p">,</span> <span class="nx">root</span><span class="p">.</span><span class="nx">browsePage</span><span class="p">,</span> <span class="s2">"browsePage"</span><span class="p">)</span>
+<span class="p">}</span>
+</pre>
+<p>The toolbar is not just responsible for showing a couple of buttons, it also
+implements the whole push'n'pop logic for pages in the <tt class="docutils literal">StackView</tt>. This
+creates a tight coupling between toolbar, pages and <tt class="docutils literal">StackView</tt>, so let's try to fix it.</p>
+</div>
+<div class="section" id="cleaning-up-the-mess">
+<h2><a class="toc-backref" href="#toc-entry-2">Cleaning up the Mess</a></h2>
+<p>We start by moving the visual components into a custom <tt class="docutils literal">StackView</tt> component:</p>
+<pre class="code qml literal-block">
+<span class="c1">// UI.View
+</span><span class="nx">StackView</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="kd">function</span> <span class="nx">showPage</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">page</span><span class="p">,</span> <span class="nx">objectName</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+
+    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">Component</span> <span class="k">browsePage:</span> <span class="nx">Page</span> <span class="p">{</span>
+        <span class="k">objectName:</span> <span class="s2">"browsePage"</span>
+        <span class="k">text:</span> <span class="s2">"Showing &lt;em&gt;Browse&lt;/em&gt; page"</span>
+    <span class="p">}</span>
+    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">Component</span> <span class="k">detailsPage:</span> <span class="nx">Page</span> <span class="p">{</span>
+        <span class="k">objectName:</span> <span class="s2">"detailsPage"</span>
+        <span class="k">text:</span> <span class="s2">"Showing &lt;em&gt;Details&lt;/em&gt; page"</span>
+    <span class="p">}</span>
+    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">Component</span> <span class="k">settingsPage:</span> <span class="nx">Page</span> <span class="p">{</span>
+        <span class="k">objectName:</span> <span class="s2">"settingsPage"</span>
+        <span class="k">text:</span> <span class="s2">"Showing &lt;em&gt;Settings&lt;/em&gt; page"</span>
+    <span class="p">}</span>
+
+    <span class="k">Component.onCompleted:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">showPage</span><span class="p">(</span><span class="nx">root</span><span class="p">,</span> <span class="nx">root</span><span class="p">.</span><span class="nx">browsePage</span><span class="p">,</span> <span class="s2">"browsePage"</span><span class="p">)</span>
+<span class="p">}</span>
+</pre>
+<p>But how do we fix the buttons' <tt class="docutils literal">onClicked</tt> behaviour now that the pages are
+no longer available to them? This is where QML's <tt class="docutils literal">Action</tt> <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a> component
+comes into play.</p>
+<p>Actions are a common pattern in UI toolkits. They encapsulate the user's
+intent to trigger predefined behaviour, usually through the click of a button.
+In QML, many interactive controls derive from <tt class="docutils literal">AbstractButton</tt> <a class="footnote-reference" href="#footnote-3" id="footnote-reference-3">[3]</a>. They all
+can be set up and controlled through actions like so:</p>
+<div class="highlight"><pre><span></span><span class="nx">Button</span> <span class="p">{</span>
+   <span class="k">action:</span> <span class="nx">Action</span> <span class="p">{</span>
+       <span class="k">text:</span> <span class="s2">"Click me!"</span>
+       <span class="k">onTriggered:</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Action triggered!"</span><span class="p">)</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>Here, the button makes use of action's properties. This enables us to split off
+the visual presentation of a behaviour from its definition! Quite often, a neat
+trick to decouple components is to inject actions instead of defining them in
+place:</p>
+<pre class="code qml literal-block">
+<span class="c1">// UI.Toolbar
+</span><span class="nx">Container</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="nx">required</span> <span class="nx">property</span> <span class="nx">Action</span> <span class="nx">browse</span>
+    <span class="nx">required</span> <span class="nx">property</span> <span class="nx">Action</span> <span class="nx">viewDetails</span>
+    <span class="nx">required</span> <span class="nx">property</span> <span class="nx">Action</span> <span class="nx">viewSettings</span>
+
+    <span class="k">contentItem:</span> <span class="nx">Row</span> <span class="p">{</span> <span class="k">spacing:</span> <span class="mi">8</span> <span class="p">}</span>
+
+    <span class="nx">Button</span> <span class="p">{</span> <span class="k">action:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">browse</span> <span class="p">}</span>
+    <span class="nx">Button</span> <span class="p">{</span> <span class="k">action:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">viewDetails</span> <span class="p">}</span>
+    <span class="nx">Button</span> <span class="p">{</span> <span class="k">action:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">viewSettings</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>Now what did we gain? Well, we can swap out or change the actions elsewhere
+without having to touch the visual presentation of them (via buttons) in the
+toolbar. Also, there's now much less logic in the toolbar that could break.</p>
+</div>
+<div class="section" id="tying-it-together">
+<h2><a class="toc-backref" href="#toc-entry-3">Tying it Together</a></h2>
+<p>View and toolbar no longer know of each other's existence. In fact, they are
+now <em>loosely coupled</em>. Their whole interaction depends entirely on how and
+where we define the actions. <tt class="docutils literal">Main.qml</tt> is a good place for that:</p>
+<pre class="code qml literal-block">
+<span class="nx">ApplicationWindow</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="k">title:</span> <span class="s2">"Using QML Actions to Decouple Components"</span>
+    <span class="k">width:</span> <span class="mi">1280</span>
+    <span class="k">height:</span> <span class="mi">800</span>
+    <span class="k">visible:</span> <span class="kc">true</span>
+    <span class="k">menuBar:</span> <span class="nx">UI</span><span class="p">.</span><span class="nx">Toolbar</span> <span class="p">{</span>
+        <span class="k">browse:</span> <span class="nx">Action</span> <span class="p">{</span>
+            <span class="k">text:</span> <span class="s2">"Browse"</span>
+            <span class="k">onTriggered:</span> <span class="nx">view</span><span class="p">.</span><span class="nx">showPage</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">view</span><span class="p">.</span><span class="nx">browsePage</span><span class="p">,</span> <span class="s2">"browsePage"</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">viewDetails:</span> <span class="nx">Action</span> <span class="p">{</span>
+            <span class="k">text:</span> <span class="s2">"View Details"</span>
+            <span class="k">onTriggered:</span> <span class="nx">view</span><span class="p">.</span><span class="nx">showPage</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">view</span><span class="p">.</span><span class="nx">detailsPage</span><span class="p">,</span> <span class="s2">"detailsPage"</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">viewSettings:</span> <span class="nx">Action</span> <span class="p">{</span>
+            <span class="k">text:</span> <span class="s2">"View Settings"</span>
+            <span class="k">onTriggered:</span> <span class="nx">view</span><span class="p">.</span><span class="nx">showPage</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">view</span><span class="p">.</span><span class="nx">browsePage</span><span class="p">,</span> <span class="s2">"settingsPage"</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="nx">UI</span><span class="p">.</span><span class="nx">View</span> <span class="p">{</span>
+        <span class="kd">id: view</span>
+
+        <span class="k">anchors.fill:</span> <span class="nx">parent</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>The toolbar has gained three new Action properties, as compared to the single
+view property in the beginning. Yet the combined maintenance cost of the Action
+properties will be far less than if we had kept the view dependency in the
+toolbar.</p>
+</div>
+<div class="section" id="references">
+<h2><a class="toc-backref" href="#toc-entry-4">References</a></h2>
+<table class="docutils footnote" frame="void" id="footnote-1" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-1">[1]</a></td><td><a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-stackview.html">QML StackView</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-2" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-2">[2]</a></td><td><a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-action.html">QML Action</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-3" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-3">[3]</a></td><td><a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-abstractbutton.html">QML AbstractButton</a></td></tr>
+</tbody>
+</table>
+</div>
+
+	</div>
+
+	<div id="related-articles">
+		<a href="/property-bindings-101.html" id="prev-neighbour">Beginner's guide to property bindings &raquo;</a>
+	</div>
+
+			<hr>
+		</article>
+
+		<footer>
+			<p>&copy; 2024 Michael Hasselmann</p>
+		</footer>
+	</div>
+
+
+</body>
+</html>
