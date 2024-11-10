@@ -290,7 +290,8 @@ aside div {
 
 #name {
 	margin-top: .7em;
-  margin-right: 1em;
+  margin-right: 0px;
+  padding-right: 1em;
 	font-size: 1.35em;
 	line-height: 1.35;
 	letter-spacing: -0.5px;
@@ -298,16 +299,16 @@ aside div {
 }
 
 #bio {
-  clear: both;
 	width: 200px;
 	line-height: 1.5;
 	margin-left: auto;
-	margin-right: 1em;
+	margin-right: 0px;
+  padding-right: 1em;
 }
 
 #sidebar-links {
-  clear: both;
 	color: #aaa;
+  padding-right: 1em;
 }
 
 #sidebar-divider {
