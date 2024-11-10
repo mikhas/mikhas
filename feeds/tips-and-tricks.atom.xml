@@ -60,7 +60,6 @@ heavy-lifting must have been done by the &lt;tt class="docutils literal"&gt;UI.T
         &lt;span class="k"&gt;text:&lt;/span&gt; &lt;span class="s2"&gt;"Showing &amp;lt;em&amp;gt;Settings&amp;lt;/em&amp;gt; page"&lt;/span&gt;
     &lt;span class="p"&gt;}&lt;/span&gt;
 
-    &lt;span class="k"&gt;background:&lt;/span&gt; &lt;span class="nx"&gt;Rectangle&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;color:&lt;/span&gt; &lt;span class="s2"&gt;"lightgrey"&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
     &lt;span class="k"&gt;contentItem:&lt;/span&gt; &lt;span class="nx"&gt;Row&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;spacing:&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 
     &lt;span class="nx"&gt;Button&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -204,6 +203,12 @@ toolbar.&lt;/p&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-3"&gt;[3]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-abstractbutton.html"&gt;QML AbstractButton&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-4" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;[4]&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-actions"&gt;Code example on GitHub&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
@@ -384,6 +389,12 @@ backend.&lt;/p&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-3"&gt;[3]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://pages-test.qt.io/qtforpython-6/PySide6/QtQml/QmlSingleton.html"&gt;QmlSingleton decorator&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-4" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;[4]&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-factory"&gt;Code example on GitHub&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;

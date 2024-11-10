@@ -238,6 +238,12 @@ of B changes and before the value of A becomes necessary. &lt;a class="reference
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-3"&gt;[3]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://doc.qt.io/qt-6/qtqml-syntax-objectattributes.html#default-properties"&gt;QML default property&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-4" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;[4]&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-properties"&gt;Code example on GitHub&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 &lt;/div&gt;
 </content><category term="Starter Kit"></category><category term="QML"></category><category term="Properties"></category></entry><entry><title>How objects are constructed in QML</title><link href="https://quitemeticulouslogic.com/multi-phase-construction.html" rel="alternate"></link><published>2024-08-20T00:00:00+02:00</published><updated>2024-08-24T00:00:00+02:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2024-08-20:/multi-phase-construction.html</id><summary type="html">
 &lt;div class="section" id="making-a-new-type"&gt;
@@ -566,6 +572,12 @@ an extendable project structure and can start experimenting with QML.&lt;/p&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
 &lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-4"&gt;[4]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;The &lt;a class="reference external" href="https://quitemeticulouslogic.com/src/app-template.zip"&gt;app template&lt;/a&gt; used in this blog post&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-5" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;[5]&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/app-template"&gt;Code example on GitHub&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;/div&gt;
