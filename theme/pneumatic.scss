@@ -380,8 +380,9 @@ aside div {
 		div { margin: 5px 0; }
 	}
 
-	#avatar { float: right; width: 160px; }
-	#bio { font-size: 0.85em; }
+	#avatar { float: right; width: 160px; margin-left: 2em; }
+	#bio { font-size: 0.85em; width: 400px; }
+  #social { width: 200px; float: right; }
 	#social .icon { padding: 0 1px; }
 	article { margin-top: 14px; }
 }
@@ -395,6 +396,10 @@ aside div {
 	}
 
 	#sidebar-divider { display: block; }
+	#avatar { float: right; width: 160px; margin-left: 2em; }
+	#bio { font-size: 0.85em; width: 400px; }
+  #social { width: 200px; float: right; }
+	#social .icon { padding: 0 1px; }
 }
 
 @media only print {
