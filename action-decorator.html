@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Basic Metas -->
+	<meta charset="utf-8">
+	<title>Decorating QML Actions with extra behaviour | Quite Meticulous Logic</title>
+	<meta name="description" content="Problem statement Let's assume our application was designed to preferredly use QML Actions. Although our components are now nicely decoupled [1], it won't be too long until we face some limitations. Namely that there is no easy way to frontload a QML Action such that it runs additional code before …">
+	<meta name="author" content="">
+	<link rel="author" href=""/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<!-- Twitter Cards and Open Graph -->
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:creator" content="">
+	<meta name="twitter:domain" content="">
+	<meta name="twitter:site" content="">
+	<meta property="og:title" content="Decorating QML Actions with extra behaviour">
+	<meta property="og:description" content="Problem statement Let's assume our application was designed to preferredly use QML Actions. Although our components are now nicely decoupled [1], it won't be too long until we face some limitations. Namely that there is no easy way to frontload a QML Action such that it runs additional code before …">
+	<meta property="og:image" content="https://quitemeticulouslogic.com/images/arch.jpeg">
+	<meta property="og:type" content="article">
+	<meta property="og:url" content="https://quitemeticulouslogic.com/action-decorator.html">
+
+	<!-- Stylesheets and Web Fonts -->
+	<link href="/theme/style.min.css?f6cd7976" rel="stylesheet">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+	<!-- Favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="//apple-touch-icon.png">
+	<link rel="icon" type="image/png" href="//favicon-16x16.png" sizes="16x16">
+	<link rel="icon" type="image/png" href="//favicon-32x32.png" sizes="32x32">
+	<meta name="theme-color" content="">
+
+	<meta name="msapplication-TileColor" content="">
+	<meta name="msapplication-TileImage" content="//mstile-144x144.png">
+	<meta name="msapplication-square70x70logo" content="//mstile-small.png">
+	<meta name="msapplication-square150x150logo" content="//mstile-medium.png">
+	<meta name="msapplication-wide310x150logo" content="//mstile-wide.png">
+	<meta name="msapplication-square310x310logo" content="//mstile-large.png">
+
+	<!--[if lt IE 9]>
+	<script src="/theme/js/html5shiv.min.js"></script>
+	<script src="/theme/js/respond.min.js"></script>
+	<![endif]-->
+</head>
+
+<body>
+	<div class="container">
+		<aside>
+			<a href="/"><img id="avatar" alt="arch" src="/images/arch.jpeg"></a>
+			<div id="name"><a href="/">Quite Meticulous Logic</a></div>
+			<div id="bio">A blog about writing super tidy QML code, with a touch of model/view and Python on the side.</div>
+
+
+			<div id="social">
+				<a href="https://github.com/mikhas" title="GitHub" class="icon fa fa-github"></a>
+				<a href="https://linkedin.com/in/michaelhasselmann" title="LinkedIn" class="icon fa fa-linkedin"></a>
+				<a href="/feeds/atom.xml" title="Atom Feed" class="icon fa fa-feed"></a>
+			</div>
+
+			<hr id="sidebar-divider">
+		</aside>
+
+		<article>
+	<h1 class="title"><a href="/action-decorator.html" title="Permalink to Decorating QML Actions with extra behaviour">Decorating QML Actions with extra behaviour</a></h1>
+	<time class="date" datetime="2024-11-11 00:00:00+01:00">Mon 11 November 2024</time>
+	<div class="content">
+		
+<div class="section" id="problem-statement">
+<h2><a class="toc-backref" href="#toc-entry-1">Problem statement</a></h2>
+<p>Let's assume our application was designed to preferredly use QML Actions.
+Although our components are now nicely decoupled <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a>, it won't be too long
+until we face some limitations. Namely that there is no easy way to frontload a
+QML Action such that it runs additional code before executing the original
+payload in its <tt class="docutils literal">onTriggered</tt> slot. It's not possible to pass arguments to the
+slot either. Worst of all, if you're just starting out to use QML Actions, you
+might not even notice that this problem is real.</p>
+<div class="section" id="a-problematic-example">
+<h3><a class="toc-backref" href="#toc-entry-2">A problematic example</a></h3>
+<p>Here's an application that let's the user browse items, and, upon selecting an
+item (by flipping a tile), reveals further actions such as <tt class="docutils literal">loadItem</tt> and
+<tt class="docutils literal">removeItem</tt>.</p>
+<p>The functionality and the bug can be easily discovered in two short video clips:</p>
+<div style="margin-bottom:1.5em; width: 100%;">
+<video controls="" src="media/qml-action-decorator/all-looks-fine.mp4" style="width: 100%;"></video>
+<strong>Video 1:</strong> A grid view of coloured tiles that, when tapped,
+  flip around and reveal more actions. On the left we we see the currently
+  loaded colour.
+ </div><div style="margin-bottom:1.5em; width: 100%;">
+<video controls="" src="media/qml-action-decorator/did-you-see-the-bug.mp4" style="width:100%;"></video>
+<strong>Video 2:</strong> The bug. Pay attention to the highlighted item
+  with the golden frame.
+</div><p>Let's look at the code. We have an <tt class="docutils literal">UI.ItemsView</tt> that displays everything
+provided by the <tt class="docutils literal">Backend.Model</tt>. Here is the essential implementation of the
+<tt class="docutils literal">UI.ItemsView</tt>:</p>
+<pre class="code qml literal-block">
+<span class="c1">// UI.ItemsView
+</span><span class="nx">GridView</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="nx">required</span> <span class="nx">property</span> <span class="nx">Action</span> <span class="nx">loadItem</span>
+    <span class="nx">required</span> <span class="nx">property</span> <span class="nx">Action</span> <span class="nx">removeItem</span>
+    <span class="nx">readonly</span> <span class="nx">property</span> <span class="kd">var</span> <span class="k">item:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">currentIndex</span><span class="p">)</span>
+
+    <span class="k">clip:</span> <span class="kc">true</span>
+    <span class="k">delegate:</span> <span class="nx">UI</span><span class="p">.</span><span class="nx">FancyTile</span> <span class="p">{</span>
+        <span class="kd">id: tile</span>
+
+        <span class="k">modelData:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">tile</span><span class="p">.</span><span class="nx">index</span><span class="p">)</span>
+        <span class="k">action:</span> <span class="nx">Action</span> <span class="p">{</span>
+            <span class="k">checkable:</span> <span class="kc">true</span>
+            <span class="k">onTriggered:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">currentIndex</span> <span class="o">=</span> <span class="nx">tile</span><span class="p">.</span><span class="nx">index</span>
+        <span class="p">}</span>
+
+        <span class="nx">Row</span> <span class="p">{</span>
+            <span class="k">anchors.centerIn:</span> <span class="nx">parent</span>
+            <span class="k">spacing:</span> <span class="mi">8</span>
+            <span class="k">visible:</span> <span class="nx">tile</span><span class="p">.</span><span class="nx">flipped</span>
+
+            <span class="c1">// A natural 3rd action would be `editItem`
+</span>            <span class="nx">Button</span> <span class="p">{</span> <span class="k">action:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">loadItem</span> <span class="p">}</span>
+            <span class="nx">Button</span> <span class="p">{</span> <span class="k">action:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">removeItem</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>Again, the obvious benefit of injecting the two actions at the top is better
+decoupling <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a>: Our view doesn't have to know how items are loaded or removed.</p>
+<p>The action to flip the tile (and to update <tt class="docutils literal">currentIndex</tt>) does not benefit
+from being injected, as it is closely tied to the view's internal behaviour.</p>
+</div>
+</div>
+<div class="section" id="problem-analysis">
+<h2><a class="toc-backref" href="#toc-entry-3">Problem analysis</a></h2>
+<p>Quite obviously, the view's selected item is the last tile we flipped, yet
+triggering one of the actions on the backside of a tile does not reselect the
+intended item.</p>
+<p>If each tile had a singular action, say <tt class="docutils literal">loadItem</tt>, we might not even notice
+the potential issue. But in our case, there are three actions. Given two items
+<cite>A</cite> &amp; <cite>B</cite>, the bug is reproduced like so:</p>
+<ol class="arabic simple">
+<li>Flip tile of item <cite>A</cite>, selecting <cite>A</cite>,</li>
+<li>Flip tile of item <cite>B</cite>, selecting <cite>B</cite>,</li>
+<li>Load (or remove) item <cite>A</cite>.</li>
+</ol>
+<p>Because <cite>B</cite> is selected, the last action affects the wrong item. We could have
+chosen a different design that would circumvent the issue at hand, but let's
+assume there are some benefits to this design, and that it was a conscious
+choice. Luckily, the fix is also obvious now: Any of the item-bound actions
+needs to somehow select the proper item just in time.</p>
+</div>
+<div class="section" id="bug-fix-attempt-1">
+<h2><a class="toc-backref" href="#toc-entry-4">Bug fix attempt #1</a></h2>
+<p>So let's just connect to the action's trigger of each of the buttons and set
+the <tt class="docutils literal">currentIndex</tt>. This will run on top of the action's original payload:</p>
+<div class="highlight"><pre><span></span><span class="nx">Button</span> <span class="p">{</span>
+    <span class="kd">id: loadButton</span>
+
+    <span class="k">action:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">loadItem</span>
+
+    <span class="nx">Connections</span> <span class="p">{</span>
+        <span class="k">target:</span> <span class="nx">loadButton</span><span class="p">.</span><span class="nx">action</span>
+        <span class="kd">function</span> <span class="nx">onTriggered</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">root</span><span class="p">.</span><span class="nx">currentIndex</span> <span class="o">=</span> <span class="nx">tile</span><span class="p">.</span><span class="nx">index</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>Firstly, this code is wrong in a very surprising way: Each <tt class="docutils literal">Connections</tt>
+instance in the view will now fire if one button is pressed, as the passed
+actions have reference symantics <a class="footnote-reference" href="#footnote-3" id="footnote-reference-3">[3]</a>. In a view that shows 30 tiles, one
+button click triggers 30 function calls as there will be 30 <tt class="docutils literal">Connections</tt>
+instances, one per button.</p>
+<p>Secondly, even if it worked, we have no guarantee that <tt class="docutils literal">currentIndex</tt> would
+be updated before the action's payload, as the execution order of multiple
+<tt class="docutils literal">onTriggered</tt> slots on the same target &amp; signal is not defined.</p>
+</div>
+<div class="section" id="bug-fix-attempt-2">
+<h2><a class="toc-backref" href="#toc-entry-5">Bug fix attempt #2</a></h2>
+<p>The faulty behaviour of the previous attempt points us in the right direction
+however: If we want to amend the button's action, we first need to create a
+separate action instance like so:</p>
+<div class="highlight"><pre><span></span><span class="nx">Button</span> <span class="p">{</span>
+    <span class="k">action:</span> <span class="nx">Action</span> <span class="p">{</span>
+        <span class="k">text:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">loadItem</span><span class="p">.</span><span class="nx">text</span>
+        <span class="k">onTriggered:</span> <span class="p">{</span>
+            <span class="nx">root</span><span class="p">.</span><span class="nx">currentIndex</span> <span class="o">=</span> <span class="nx">tile</span><span class="p">.</span><span class="nx">index</span><span class="p">;</span>
+            <span class="nx">root</span><span class="p">.</span><span class="nx">loadItem</span><span class="p">.</span><span class="nx">trigger</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>This fixes the bug! But how would we generalize this pattern?</p>
+</div>
+<div class="section" id="introducing-the-action-decorator">
+<h2><a class="toc-backref" href="#toc-entry-6">Introducing: The Action Decorator</a></h2>
+<p>Decorators <a class="footnote-reference" href="#footnote-4" id="footnote-reference-4">[4]</a> are powerful and well-known to Python developers. The principle
+of using an outer and inner function, chained together, is exactly how we fixed
+our bug. To support the general case, we need to wrap the complete QML Action
+API <a class="footnote-reference" href="#footnote-5" id="footnote-reference-5">[5]</a> like so:</p>
+<pre class="code qml literal-block">
+<span class="c1">// Tools.ActionDecorator
+</span><span class="nx">Action</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="nx">required</span> <span class="nx">property</span> <span class="nx">Action</span> <span class="nx">action</span>
+
+    <span class="k">checkable:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">action</span><span class="p">.</span><span class="nx">checkable</span>
+    <span class="k">checked:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">action</span><span class="p">.</span><span class="nx">checked</span>
+    <span class="k">enabled:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">action</span><span class="p">.</span><span class="nx">enabled</span>
+    <span class="k">icon:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">action</span><span class="p">.</span><span class="nx">icon</span>
+    <span class="k">shortcut:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">action</span><span class="p">.</span><span class="nx">shortcut</span>
+    <span class="k">text:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">action</span><span class="p">.</span><span class="nx">text</span>
+    <span class="k">onTriggered:</span> <span class="nx">Qt</span><span class="p">.</span><span class="nx">callLater</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">action</span><span class="p">.</span><span class="nx">trigger</span><span class="p">)</span>
+<span class="p">}</span>
+</pre>
+<p>Here, <tt class="docutils literal">Qt.callLater()</tt> is used to reorder execution so that the outer
+action's <tt class="docutils literal">onTriggered</tt> slot runs after the inner action's <tt class="docutils literal">onTriggered</tt>
+slot. This allows us to use the action decorator in a very natural way:</p>
+<div class="highlight"><pre><span></span><span class="nx">Button</span> <span class="p">{</span>
+    <span class="k">action:</span> <span class="nx">Tools</span><span class="p">.</span><span class="nx">ActionDecorator</span> <span class="p">{</span>
+        <span class="k">action:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">loadItem</span>
+        <span class="k">onTriggered:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">currentIndex</span> <span class="o">=</span> <span class="nx">tile</span><span class="p">.</span><span class="nx">index</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+<p>The extra behaviour we want to run before the original action's <tt class="docutils literal">onTriggered</tt>
+slot is simply placed into the decorating action's own <tt class="docutils literal">onTriggered</tt> slot!</p>
+</div>
+<div class="section" id="conclusion">
+<h2><a class="toc-backref" href="#toc-entry-7">Conclusion</a></h2>
+<p>We've shown the usefulness of QML Actions in encapsulating behaviour that
+originates from user interactions. We also demonstrated that injectable actions
+improve our software design through better decoupling. Then we took a deeper
+look at some of typical issues one encounters when employing actions. We saw
+that careless use of <tt class="docutils literal">Connections</tt> can lead to surprising bugs. Eventually we
+discovered the <tt class="docutils literal">ActionDecorator</tt> pattern that shares strong similarities with
+Python decorators.</p>
+<p>As a bonus, here's the video clip of the correct application functionality:</p>
+<div style="margin-bottom:1.5em;width:100%;">
+<video controls="" src="media/qml-action-decorator/it-all-works-now.mp4" style="width:100%"></video>
+<strong>Video 3:</strong>It all works now
+</div></div>
+<div class="section" id="references">
+<h2><a class="toc-backref" href="#toc-entry-8">References</a></h2>
+<table class="docutils footnote" frame="void" id="footnote-1" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-1">[1]</a></td><td><a class="reference external" href="./actions-decouple-components.html">Using QML Actions to decouple components</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-2" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-2">[2]</a></td><td><a class="reference external" href="https://www.youtube.com/watch?v=uWseUdUqM5U">Visualized explanation of Loose Coupling</a> (video length: 6 minutes)</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-3" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-3">[3]</a></td><td><a class="reference external" href="https://hackingcpp.com/cs/value_vs_reference_semantics.html">Value Semantics vs. Reference Semantics</a>, with examples in C++ and Python</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-4" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-4">[4]</a></td><td><a class="reference external" href="https://book.pythontips.com/en/latest/decorators.html">Decorators in Python</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-5" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-5">[5]</a></td><td><a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-action.html">QML Action</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-6" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label">[6]</td><td><a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-action-decorator">Code example on GitHub</a></td></tr>
+</tbody>
+</table>
+</div>
+
+	</div>
+
+	<div id="related-articles">
+		<a href="/actions-decouple-components.html" id="prev-neighbour">Using QML Actions to decouple components &raquo;</a>
+	</div>
+
+			<hr>
+		</article>
+
+		<footer>
+			<p>&copy; 2024 Michael Hasselmann</p>
+		</footer>
+	</div>
+
+
+</body>
+</html>
