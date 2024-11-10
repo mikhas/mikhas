@@ -190,6 +190,8 @@ pre.code, pre {
 	border-radius: 8px;
 	border: 1px goldenrod solid;
 	padding: .5em 1.2em;
+  overflow-x: scroll;
+  -webkit-overflow-scrolling: touch;
 }
 
 
