@@ -31,7 +31,7 @@ item (by flipping a tile), reveals further actions such as &lt;tt class="docutil
 &lt;strong&gt;Video 2:&lt;/strong&gt; The bug. Pay attention to the highlighted item
   with the golden frame.
 &lt;/div&gt;&lt;p&gt;Let's look at the code. We have an &lt;tt class="docutils literal"&gt;UI.ItemsView&lt;/tt&gt; that displays everything
-provided by the &lt;tt class="docutils literal"&gt;Backend.Model&lt;/tt&gt;. Here is the essential implementation of the
+provided by a backend model. Here is the essential implementation of the
 &lt;tt class="docutils literal"&gt;UI.ItemsView&lt;/tt&gt;:&lt;/p&gt;
 &lt;pre class="code qml literal-block"&gt;
 &lt;span class="c1"&gt;// UI.ItemsView
@@ -179,7 +179,7 @@ Python decorators.&lt;/p&gt;
 &lt;p&gt;As a bonus, here's the video clip of the correct application functionality:&lt;/p&gt;
 &lt;div style="margin-bottom:1.5em;width:100%;"&gt;
 &lt;video controls="" src="media/qml-action-decorator/it-all-works-now.mp4" style="width:100%"&gt;&lt;/video&gt;
-&lt;strong&gt;Video 3:&lt;/strong&gt;It all works now
+&lt;strong&gt;Video 3:&lt;/strong&gt; It all works now
 &lt;/div&gt;&lt;/div&gt;
 &lt;div class="section" id="references"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-8"&gt;References&lt;/a&gt;&lt;/h2&gt;
