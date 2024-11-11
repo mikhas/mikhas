@@ -257,7 +257,7 @@ together with nice transition animations.&lt;/p&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;
 &lt;p&gt;And this is how it looks:&lt;/p&gt;
-&lt;img alt="" src="images/qml-actions/stackview-with-pages.png"/&gt;
+&lt;img alt="StackView with three pages" src="images/qml-actions/stackview-with-pages.png"/&gt;
 &lt;p&gt;Simple enough, right? But you of course already guessed that all the
 heavy-lifting must have been done by the &lt;tt class="docutils literal"&gt;UI.Toolbar&lt;/tt&gt;:&lt;/p&gt;
 &lt;pre class="code qml literal-block"&gt;
