@@ -4,7 +4,7 @@
 	<!-- Basic Metas -->
 	<meta charset="utf-8">
 	<title>Decorating QML Actions with extra behaviour | Quite Meticulous Logic</title>
-	<meta name="description" content="Problem statement Let's assume our application was designed to preferredly use QML Actions. Although our components are now nicely decoupled [1], it won't be too long until we face some limitations. Namely that there is no easy way to frontload a QML Action such that it runs additional code before …">
+	<meta name="description" content="Problem statement Let's assume our application was designed to preferredly use QML Actions. Although our components are now nicely decoupled [1], it won't be too long until we face some limitations. Namely that there is no easy way to intercept a QML Action's trigger such that we could run additional …">
 	<meta name="author" content="">
 	<link rel="author" href=""/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -15,7 +15,7 @@
 	<meta name="twitter:domain" content="">
 	<meta name="twitter:site" content="">
 	<meta property="og:title" content="Decorating QML Actions with extra behaviour">
-	<meta property="og:description" content="Problem statement Let's assume our application was designed to preferredly use QML Actions. Although our components are now nicely decoupled [1], it won't be too long until we face some limitations. Namely that there is no easy way to frontload a QML Action such that it runs additional code before …">
+	<meta property="og:description" content="Problem statement Let's assume our application was designed to preferredly use QML Actions. Although our components are now nicely decoupled [1], it won't be too long until we face some limitations. Namely that there is no easy way to intercept a QML Action's trigger such that we could run additional …">
 	<meta property="og:image" content="https://quitemeticulouslogic.com/images/arch.jpeg">
 	<meta property="og:type" content="article">
 	<meta property="og:url" content="https://quitemeticulouslogic.com/action-decorator.html">
@@ -69,11 +69,11 @@
 <h2><a class="toc-backref" href="#toc-entry-1">Problem statement</a></h2>
 <p>Let's assume our application was designed to preferredly use QML Actions.
 Although our components are now nicely decoupled <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a>, it won't be too long
-until we face some limitations. Namely that there is no easy way to frontload a
-QML Action such that it runs additional code before executing the original
-payload in its <tt class="docutils literal">onTriggered</tt> slot. It's not possible to pass arguments to the
-slot either. Worst of all, if you're just starting out to use QML Actions, you
-might not even notice that this problem is real.</p>
+until we face some limitations. Namely that there is no easy way to intercept a
+QML Action's trigger such that we could run additional code just before its
+original payload. It's not possible to pass arguments to the slot either. Worst
+of all, if you're just starting out to use QML Actions, you might not even
+notice that this problem is real.</p>
 <div class="section" id="a-problematic-example">
 <h3><a class="toc-backref" href="#toc-entry-2">A problematic example</a></h3>
 <p>Here's an application that let's the user browse items, and, upon selecting an
@@ -214,7 +214,7 @@ API <a class="footnote-reference" href="#footnote-5" id="footnote-reference-5">[
 <span class="p">}</span>
 </pre>
 <p>Here, <tt class="docutils literal">Qt.callLater()</tt> is used to reorder execution so that the outer
-action's <tt class="docutils literal">onTriggered</tt> slot runs after the inner action's <tt class="docutils literal">onTriggered</tt>
+action's <tt class="docutils literal">onTriggered</tt> slot runs before the inner action's <tt class="docutils literal">onTriggered</tt>
 slot. This allows us to use the action decorator in a very natural way:</p>
 <div class="highlight"><pre><span></span><span class="nx">Button</span> <span class="p">{</span>
     <span class="k">action:</span> <span class="nx">Tools</span><span class="p">.</span><span class="nx">ActionDecorator</span> <span class="p">{</span>
