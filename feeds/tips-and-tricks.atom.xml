@@ -1,5 +1,201 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic - Tips and Tricks</title><link href="https://quitemeticulouslogic.com/" rel="alternate"></link><link href="https://quitemeticulouslogic.com/feeds/tips-and-tricks.atom.xml" rel="self"></link><id>https://quitemeticulouslogic.com/</id><updated>2024-11-11T00:00:00+01:00</updated><entry><title>Decorating QML Actions with extra behaviour</title><link href="https://quitemeticulouslogic.com/action-decorator.html" rel="alternate"></link><published>2024-11-11T00:00:00+01:00</published><updated>2024-11-11T00:00:00+01:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2024-11-11:/action-decorator.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic - Tips and Tricks</title><link href="https://quitemeticulouslogic.com/" rel="alternate"></link><link href="https://quitemeticulouslogic.com/feeds/tips-and-tricks.atom.xml" rel="self"></link><id>https://quitemeticulouslogic.com/</id><updated>2024-11-15T00:00:00+01:00</updated><entry><title>Implementing natural zoom for images</title><link href="https://quitemeticulouslogic.com/zoomable-image.html" rel="alternate"></link><published>2024-11-15T00:00:00+01:00</published><updated>2024-11-15T00:00:00+01:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2024-11-15:/zoomable-image.html</id><summary type="html">
+&lt;div class="section" id="problem-statement"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Problem statement&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Many QML applications will at some point have to show photos or images of some
+form. QML has an obviously named component for that, &lt;tt class="docutils literal"&gt;Image&lt;/tt&gt; &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt;. It's easy
+enough to use:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nx"&gt;Image&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;source:&lt;/span&gt; &lt;span class="s2"&gt;"url/or/path/to/image.png"&lt;/span&gt; &lt;span class="c1"&gt;// or a data URL&lt;/span&gt;
+    &lt;span class="k"&gt;fillMode:&lt;/span&gt; &lt;span class="nx"&gt;Image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;PreserveAspectFit&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We can …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
+&lt;div class="section" id="problem-statement"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Problem statement&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Many QML applications will at some point have to show photos or images of some
+form. QML has an obviously named component for that, &lt;tt class="docutils literal"&gt;Image&lt;/tt&gt; &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt;. It's easy
+enough to use:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nx"&gt;Image&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;source:&lt;/span&gt; &lt;span class="s2"&gt;"url/or/path/to/image.png"&lt;/span&gt; &lt;span class="c1"&gt;// or a data URL&lt;/span&gt;
+    &lt;span class="k"&gt;fillMode:&lt;/span&gt; &lt;span class="nx"&gt;Image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;PreserveAspectFit&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We can either set width and height ourselves, or let them be implicitely
+defined by the loaded image. The &lt;tt class="docutils literal"&gt;source&lt;/tt&gt; can be a file name, a remote URL or
+a data URL &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;If the images are large photos or detailed figures, the users will eventually
+request zoomable images. They might also ask for scale-to-fit, in case of
+oversized images. These two requests are interlinked, as both depend on scaling
+the image.&lt;/p&gt;
+&lt;p&gt;So we manipulate the &lt;tt class="docutils literal"&gt;scale&lt;/tt&gt; property, set it to the desired zoom level,
+place the &lt;tt class="docutils literal"&gt;Image&lt;/tt&gt; into a &lt;tt class="docutils literal"&gt;Flickable&lt;/tt&gt; &lt;a class="footnote-reference" href="#footnote-3" id="footnote-reference-3"&gt;[3]&lt;/a&gt; to keep all areas of the image
+reachable, and we're done, right?.&lt;/p&gt;
+&lt;p&gt;Well, no.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-flickable-pattern"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;The Flickable pattern&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Whenever you need to make some oversized content scrollable, you can try your
+luck with a &lt;tt class="docutils literal"&gt;ScrollView&lt;/tt&gt; or go for the &lt;tt class="docutils literal"&gt;Flickable&lt;/tt&gt; which offers more
+fine-grained control (and fewer surprises). Here's the essential pattern:&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="c1"&gt;// FlickableSomething.qml
+&lt;/span&gt;&lt;span class="nx"&gt;Flickable&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;id: root&lt;/span&gt;
+
+    &lt;span class="k"&gt;clip:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+    &lt;span class="k"&gt;contentWidth:&lt;/span&gt; &lt;span class="nx"&gt;content&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt;
+    &lt;span class="k"&gt;contentHeight:&lt;/span&gt; &lt;span class="nx"&gt;content&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;height&lt;/span&gt;
+    &lt;span class="k"&gt;boundsMovement:&lt;/span&gt; &lt;span class="nx"&gt;Flickable&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;StopAtBounds&lt;/span&gt;
+    &lt;span class="k"&gt;ScrollBar.horizontal:&lt;/span&gt; &lt;span class="nx"&gt;ScrollBar&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+    &lt;span class="k"&gt;ScrollBar.vertical:&lt;/span&gt; &lt;span class="nx"&gt;ScrollBar&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+
+    &lt;span class="nx"&gt;Something&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="kd"&gt;id: content&lt;/span&gt;
+
+        &lt;span class="c1"&gt;// Optional: Only allows vertical scrolling, as we fit for width.
+&lt;/span&gt;        &lt;span class="k"&gt;width:&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;leftMargin&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;rightMargin&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;This will work as expected. The scrollbars appear as needed and the mouse wheel
+can be used for (vertical) scrolling.&lt;/p&gt;
+&lt;p&gt;It's a good idea to stick with the naming convention of
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;FlickableSomething[.qml]&lt;/span&gt;&lt;/tt&gt; and to keep the &lt;tt class="docutils literal"&gt;Flickable&lt;/tt&gt; at the root of your
+custom component. This increases reusability and allows for flexible
+adjustments of the &lt;tt class="docutils literal"&gt;Flickable&lt;/tt&gt; behaviour to the specific use-case.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-zoomable-image"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;A zoomable image&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Let's adopt the Flickable pattern for our &lt;tt class="docutils literal"&gt;Image&lt;/tt&gt; component:&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="c1"&gt;// ZoomableImage.qml
+&lt;/span&gt;&lt;span class="nx"&gt;Flickable&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;id: root&lt;/span&gt;
+
+    &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;setZoom&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;zoom:&lt;/span&gt; &lt;span class="nx"&gt;real&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;originX:&lt;/span&gt; &lt;span class="nx"&gt;real&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;originY:&lt;/span&gt; &lt;span class="nx"&gt;real&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="p"&gt;...&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="nx"&gt;property&lt;/span&gt; &lt;span class="nx"&gt;alias&lt;/span&gt; &lt;span class="k"&gt;source:&lt;/span&gt; &lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;source&lt;/span&gt;
+
+    &lt;span class="k"&gt;clip:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+    &lt;span class="k"&gt;contentWidth:&lt;/span&gt; &lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;scale&lt;/span&gt;
+    &lt;span class="k"&gt;contentHeight:&lt;/span&gt; &lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;height&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;scale&lt;/span&gt;
+    &lt;span class="k"&gt;boundsMovement:&lt;/span&gt; &lt;span class="nx"&gt;Flickable&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;StopAtBounds&lt;/span&gt;
+    &lt;span class="k"&gt;ScrollBar.horizontal:&lt;/span&gt; &lt;span class="nx"&gt;ScrollBar&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+    &lt;span class="k"&gt;ScrollBar.vertical:&lt;/span&gt; &lt;span class="nx"&gt;ScrollBar&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+
+    &lt;span class="nx"&gt;Image&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="kd"&gt;id: image&lt;/span&gt;
+
+        &lt;span class="c1"&gt;// Use the available width to fit image. Due to the fillMode, the image
+&lt;/span&gt;        &lt;span class="c1"&gt;// will be scaled accordingly. The initial scale is unaffected and will
+&lt;/span&gt;        &lt;span class="c1"&gt;// remain at 1.
+&lt;/span&gt;        &lt;span class="k"&gt;width:&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;leftMargin&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;rightMargin&lt;/span&gt;
+        &lt;span class="k"&gt;fillMode:&lt;/span&gt; &lt;span class="nx"&gt;Image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;PreserveAspectFit&lt;/span&gt;
+        &lt;span class="c1"&gt;// `transformOrigin` needs to be mapped to root.contentX = 0, root.contentY = 0
+&lt;/span&gt;        &lt;span class="k"&gt;transformOrigin:&lt;/span&gt; &lt;span class="nx"&gt;Item&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;TopLeft&lt;/span&gt;
+        &lt;span class="k"&gt;horizontalAlignment:&lt;/span&gt; &lt;span class="nx"&gt;Image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;AlignLeft&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="nx"&gt;MouseArea&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;anchors.fill:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;
+        &lt;span class="k"&gt;acceptedButtons:&lt;/span&gt; &lt;span class="nx"&gt;Qt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;NoButton&lt;/span&gt;
+        &lt;span class="k"&gt;onWheel:&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;event&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="kr"&gt;const&lt;/span&gt; &lt;span class="nx"&gt;stepSize&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;event&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;angleDelta&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;y&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;?&lt;/span&gt; &lt;span class="mf"&gt;0.04&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mf"&gt;0.04&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+            &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;setZoom&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;scale&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;stepSize&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;event&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;event&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;y&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+            &lt;span class="c1"&gt;// Consumes the mouse event before the `Flickable` can process it.
+&lt;/span&gt;            &lt;span class="nx"&gt;wheel&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;accepted&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Notice the renaming to &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;ZoomableImage[.qml]&lt;/span&gt;&lt;/tt&gt; to highlight the added
+functionality. The &lt;tt class="docutils literal"&gt;source&lt;/tt&gt; alias property is important so we can set the
+image source from the outside.&lt;/p&gt;
+&lt;p&gt;We've used a &lt;tt class="docutils literal"&gt;MouseArea&lt;/tt&gt; &lt;a class="footnote-reference" href="#footnote-4" id="footnote-reference-4"&gt;[4]&lt;/a&gt; to overlay the Flickable. This enables us to
+intercept the mouse wheel event before it reaches the Flickable. Wheel
+scrolling on the Flickable is thus disabled and remapped to zooming instead.
+The Flickable is still pannable through a mouse grab.&lt;/p&gt;
+&lt;p&gt;Importantly, for zoom to feel natural to the user, we need to:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Set the &lt;tt class="docutils literal"&gt;image.scale&lt;/tt&gt; to the new zoom level,&lt;/li&gt;
+&lt;li&gt;Reposition the Flickable's content (our image) inside the Flickable's
+viewport, so that to the user it appears that we zoomed in (or out) exactly
+at the current mouse cursor position.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This is all handled by the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;setZoom(...)&lt;/span&gt;&lt;/tt&gt; function:&lt;/p&gt;
+&lt;pre class="code javascript literal-block"&gt;
+&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;setZoom&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;zoom&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;real&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;originX&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;real&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;originY&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;real&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;minZoom&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.25&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;maxZoom&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;16.0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;digits&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+
+    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;roundToFixed&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;digits&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;=&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;
+        &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;factor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;Math&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;pow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;10&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;digits&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+        &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;Math&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;round&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;value&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;factor&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;factor&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+
+    &lt;/span&gt;&lt;span class="c1"&gt;// Change zoom in origin, which defaults to the center of the Flickable&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="c1"&gt;// `root` refers to the Flickable&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;isNaN&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;originX&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;?&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;contentX&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;originX&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;y&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;isNaN&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;originY&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;?&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;contentY&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;height&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;originY&lt;/span&gt;&lt;span class="w"&gt;
+
+    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;clampedZoom&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;Math&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;min&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;maxZoom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;Math&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;max&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;minZoom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;zoom&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;roundedZoom&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;roundToFixed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;clampedZoom&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;digits&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="kd"&gt;const&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;normalizedFactor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;roundedZoom&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;scale&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;scale&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+
+    &lt;/span&gt;&lt;span class="c1"&gt;// Update Flickable's state&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="nx"&gt;image&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;scale&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;roundedZoom&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;contentX&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;normalizedFactor&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+    &lt;/span&gt;&lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;contentY&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;y&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;normalizedFactor&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Eventually, this is how our example application &lt;a class="footnote-reference" href="#footnote-5" id="footnote-reference-5"&gt;[5]&lt;/a&gt; will look:&lt;/p&gt;
+&lt;img alt="Application screenshot" src="images/qml-zoomable-image/zoomable-image.png"/&gt;
+&lt;/div&gt;
+&lt;div class="section" id="summary"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;Summary&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;QML components are inherently composable. We've demonstrated the flexibility of
+this approach by creating a new custom component that inherits behaviour from
+both a Flickable and an Image.&lt;/p&gt;
+&lt;p&gt;We've also shown that QML allows us to selectively redefine behaviour such that
+it matches the use-case at hand. Here, we remapped wheel scrolling to zoom.
+Finally, to get the user experience just right, we rely on JavaScript to
+implement natural zoom.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;References&lt;/a&gt;&lt;/h2&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-1" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-image.html"&gt;QML Image&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-2" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/URI/Schemes/data"&gt;Data URLs&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-3" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-3"&gt;[3]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-flickable.html"&gt;QML Flickable&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-4" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-4"&gt;[4]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-mousearea.html"&gt;QML MouseArea&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-5" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-5"&gt;[5]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-zoomable-image"&gt;Code example on GitHub&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+</content><category term="Tips and Tricks"></category><category term="QML"></category></entry><entry><title>Decorating QML Actions with extra behaviour</title><link href="https://quitemeticulouslogic.com/action-decorator.html" rel="alternate"></link><published>2024-11-11T00:00:00+01:00</published><updated>2024-11-11T00:00:00+01:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2024-11-11:/action-decorator.html</id><summary type="html">
 &lt;div class="section" id="problem-statement"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Problem statement&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Let's assume our application was designed to preferredly use QML Actions.
