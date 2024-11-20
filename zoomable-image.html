@@ -203,7 +203,7 @@ at the current mouse cursor position.</li>
     </span><span class="nx">root</span><span class="p">.</span><span class="nx">contentY</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">normalizedFactor</span><span class="p">;</span><span class="w">
 </span><span class="p">}</span>
 </pre>
-<p>Eventually, this is how our example application <a class="footnote-reference" href="#footnote-5" id="footnote-reference-5">[5]</a> will look:</p>
+<p>Eventually, this is how our example application <a class="footnote-reference" href="#footnote-7" id="footnote-reference-5">[7]</a> will look:</p>
 <img alt="Application screenshot" src="images/qml-zoomable-image/zoomable-image.png"/>
 </div>
 <div class="section" id="encore-keep-the-image-centered-when-zooming-out">
@@ -216,7 +216,7 @@ values to <cite>contentX</cite> or <cite>contentY</cite>, so if we want to keep 
 the viewport, we need to modify the image's <cite>x</cite> and <cite>y</cite> properties to move its
 origin.</p>
 <p>Keeping the image centered is easy and a good opportunity to showcase the
-proper use of <tt class="docutils literal">Binding</tt> components <a class="footnote-reference" href="#footnote-6" id="footnote-reference-7">[6]</a>. This is what we need to add to our
+proper use of <tt class="docutils literal">Binding</tt> components <a class="footnote-reference" href="#footnote-5" id="footnote-reference-7">[5]</a>. This is what we need to add to our
 <tt class="docutils literal">Image</tt>:</p>
 <pre class="code qml literal-block">
 <span class="nx">Image</span> <span class="p">{</span>
@@ -309,19 +309,19 @@ implement natural zoom.</p>
 <table class="docutils footnote" frame="void" id="footnote-5" rules="none">
 <colgroup><col class="label"/><col/></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#footnote-reference-5">[5]</a></td><td><cite>How to use Binding component &lt;property-bindings-101.html#toc-entry-3&gt;</cite></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-7">[5]</a></td><td><a class="reference external" href="property-bindings-101#toc-entry-3">How to use Binding component</a></td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="footnote-6" rules="none">
 <colgroup><col class="label"/><col/></colgroup>
 <tbody valign="top">
-<tr><td class="label">[6]</td><td><em>(<a class="fn-backref" href="#footnote-reference-6">1</a>, <a class="fn-backref" href="#footnote-reference-7">2</a>)</em> <a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/c5cce734ef9857cf3f44fcbda004998428171bd3/src/qml-zoomable-image">Code example on GitHub</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-6">[6]</a></td><td><a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/c5cce734ef9857cf3f44fcbda004998428171bd3/src/qml-zoomable-image">Code example on GitHub (with zoom-out glitch)</a></td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="footnote-7" rules="none">
 <colgroup><col class="label"/><col/></colgroup>
 <tbody valign="top">
-<tr><td class="label">[7]</td><td><a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-zoomable-image">Code example on GitHub (encore)</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-5">[7]</a></td><td><a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-zoomable-image">Code example on GitHub (fixed)</a></td></tr>
 </tbody>
 </table>
 </div>
