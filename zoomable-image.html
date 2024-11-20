@@ -206,8 +206,72 @@ at the current mouse cursor position.</li>
 <p>Eventually, this is how our example application <a class="footnote-reference" href="#footnote-5" id="footnote-reference-5">[5]</a> will look:</p>
 <img alt="Application screenshot" src="images/qml-zoomable-image/zoomable-image.png"/>
 </div>
+<div class="section" id="encore-keep-the-image-centered-when-zooming-out">
+<h2><a class="toc-backref" href="#toc-entry-4">Encore: Keep the image centered when zooming out</a></h2>
+<p>If you assemble the code listings and build the example application yourself
+(or use this commit on GitHub <a class="footnote-reference" href="#footnote-6" id="footnote-reference-6">[6]</a>), you'll notice a strange behaviour when
+zooming out: As the image gets smaller than the Flickable's viewport, the image
+is stuck to the top-left corner. This happens because we cannot assign negative
+values to <cite>contentX</cite> or <cite>contentY</cite>, so if we want to keep the image centered in
+the viewport, we need to modify the image's <cite>x</cite> and <cite>y</cite> properties to move its
+origin.</p>
+<p>Keeping the image centered is easy and a good opportunity to showcase the
+proper use of <tt class="docutils literal">Binding</tt> components <a class="footnote-reference" href="#footnote-6" id="footnote-reference-7">[6]</a>. This is what we need to add to our
+<tt class="docutils literal">Image</tt>:</p>
+<pre class="code qml literal-block">
+<span class="nx">Image</span> <span class="p">{</span>
+    <span class="p">...</span>
+
+    <span class="k">x:</span> <span class="mi">0</span>
+    <span class="k">y:</span> <span class="mi">0</span>
+    <span class="c1">// Two bindings to keep the image centered on zoom out.
+</span>    <span class="c1">// `root` refers to the Flickable
+</span>    <span class="nx">Binding</span> <span class="nx">on</span> <span class="nx">x</span> <span class="p">{</span>
+        <span class="k">when:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">width</span> <span class="o">&gt;</span> <span class="nx">root</span><span class="p">.</span><span class="nx">contentWidth</span>
+        <span class="k">value:</span> <span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">width</span> <span class="o">-</span> <span class="nx">root</span><span class="p">.</span><span class="nx">contentWidth</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="p">}</span>
+    <span class="nx">Binding</span> <span class="nx">on</span> <span class="nx">y</span> <span class="p">{</span>
+        <span class="k">when:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">height</span> <span class="o">&gt;</span> <span class="nx">root</span><span class="p">.</span><span class="nx">contentHeight</span>
+        <span class="k">value:</span> <span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">height</span> <span class="o">-</span> <span class="nx">root</span><span class="p">.</span><span class="nx">contentHeight</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>But this is not enough. Something strange is going on with our <tt class="docutils literal">MouseArea</tt>!
+When zooming out, it's still stuck in the top-left corner whereas our <tt class="docutils literal">Image</tt>
+now gets centered correctly. A neat trick to see the issue is to make the
+<tt class="docutils literal">MouseArea</tt> visible with a <tt class="docutils literal">Rectangle</tt> that we place inside:</p>
+<pre class="code qml literal-block">
+<span class="nx">MouseArea</span> <span class="p">{</span>
+    <span class="p">...</span>
+
+    <span class="nx">Rectangle</span> <span class="p">{</span>
+        <span class="k">anchors.fill:</span> <span class="nx">parent</span>
+        <span class="k">color:</span> <span class="s2">"crimson"</span>
+        <span class="k">opacity:</span> <span class="mf">0.15</span>
+        <span class="nx">border</span> <span class="p">{</span>
+            <span class="k">width:</span> <span class="mi">1</span>
+            <span class="k">color:</span> <span class="s2">"black"</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<img alt="MouseArea &amp; Image are diverging when zooming out" src="images/qml-zoomable-image/strange-mousearea.png"/>
+<p>Apparently, the anchoring of our <tt class="docutils literal">MouseArea</tt> is causing the issue. So instead
+of using anchors, we position it freely like so:</p>
+<pre class="code qml literal-block">
+<span class="nx">MouseArea</span> <span class="p">{</span>
+    <span class="c1">// Sometimes, direct positioning (and sizing) is the best way...
+</span>    <span class="k">x:</span> <span class="nx">image</span><span class="p">.</span><span class="nx">x</span>
+    <span class="k">y:</span> <span class="nx">image</span><span class="p">.</span><span class="nx">y</span>
+    <span class="k">width:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">width</span>
+    <span class="k">height:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">height</span>
+
+    <span class="p">...</span>
+<span class="p">}</span>
+</pre>
+</div>
 <div class="section" id="summary">
-<h2><a class="toc-backref" href="#toc-entry-4">Summary</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-5">Summary</a></h2>
 <p>QML components are inherently composable. We've demonstrated the flexibility of
 this approach by creating a new custom component that inherits behaviour from
 both a Flickable and an Image.</p>
@@ -217,7 +281,7 @@ Finally, to get the user experience just right, we rely on JavaScript to
 implement natural zoom.</p>
 </div>
 <div class="section" id="references">
-<h2><a class="toc-backref" href="#toc-entry-5">References</a></h2>
+<h2><a class="toc-backref" href="#toc-entry-6">References</a></h2>
 <table class="docutils footnote" frame="void" id="footnote-1" rules="none">
 <colgroup><col class="label"/><col/></colgroup>
 <tbody valign="top">
@@ -245,7 +309,19 @@ implement natural zoom.</p>
 <table class="docutils footnote" frame="void" id="footnote-5" rules="none">
 <colgroup><col class="label"/><col/></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#footnote-reference-5">[5]</a></td><td><a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-zoomable-image">Code example on GitHub</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-5">[5]</a></td><td><cite>How to use Binding component &lt;property-bindings-101.html#toc-entry-3&gt;</cite></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-6" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label">[6]</td><td><em>(<a class="fn-backref" href="#footnote-reference-6">1</a>, <a class="fn-backref" href="#footnote-reference-7">2</a>)</em> <a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/c5cce734ef9857cf3f44fcbda004998428171bd3/src/qml-zoomable-image">Code example on GitHub</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-7" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label">[7]</td><td><a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-zoomable-image">Code example on GitHub (encore)</a></td></tr>
 </tbody>
 </table>
 </div>
