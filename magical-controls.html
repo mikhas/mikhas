@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Basic Metas -->
+	<meta charset="utf-8">
+	<title>What makes Control components so magical? | Quite Meticulous Logic</title>
+	<meta name="description" content="Problem Statement If you come from traditional UI toolkits such as GTK [1] or Qt Widgets [2] then the ultra-flexible way how QML lets you position items and deal with layouts will be confusing. First, there isn't just one way but several layout strategies to choose from: Direct positioning & widget …">
+	<meta name="author" content="">
+	<link rel="author" href=""/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<!-- Twitter Cards and Open Graph -->
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:creator" content="">
+	<meta name="twitter:domain" content="">
+	<meta name="twitter:site" content="">
+	<meta property="og:title" content="What makes Control components so magical?">
+	<meta property="og:description" content="Problem Statement If you come from traditional UI toolkits such as GTK [1] or Qt Widgets [2] then the ultra-flexible way how QML lets you position items and deal with layouts will be confusing. First, there isn't just one way but several layout strategies to choose from: Direct positioning & widget …">
+	<meta property="og:image" content="https://quitemeticulouslogic.com/images/arch.jpeg">
+	<meta property="og:type" content="article">
+	<meta property="og:url" content="https://quitemeticulouslogic.com/magical-controls.html">
+
+	<!-- Stylesheets and Web Fonts -->
+	<link href="/theme/style.min.css?f6cd7976" rel="stylesheet">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+	<!-- Favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="//apple-touch-icon.png">
+	<link rel="icon" type="image/png" href="//favicon-16x16.png" sizes="16x16">
+	<link rel="icon" type="image/png" href="//favicon-32x32.png" sizes="32x32">
+	<meta name="theme-color" content="">
+
+	<meta name="msapplication-TileColor" content="">
+	<meta name="msapplication-TileImage" content="//mstile-144x144.png">
+	<meta name="msapplication-square70x70logo" content="//mstile-small.png">
+	<meta name="msapplication-square150x150logo" content="//mstile-medium.png">
+	<meta name="msapplication-wide310x150logo" content="//mstile-wide.png">
+	<meta name="msapplication-square310x310logo" content="//mstile-large.png">
+
+	<!--[if lt IE 9]>
+	<script src="/theme/js/html5shiv.min.js"></script>
+	<script src="/theme/js/respond.min.js"></script>
+	<![endif]-->
+</head>
+
+<body>
+	<div class="container">
+		<aside>
+			<a href="/"><img id="avatar" alt="arch" src="/images/arch.jpeg"></a>
+			<div id="name"><a href="/">Quite Meticulous Logic</a></div>
+			<div id="bio">A blog about writing super tidy QML code, with a touch of model/view and Python on the side.</div>
+
+
+			<div id="social">
+				<a href="https://github.com/mikhas/quick-licks-of-magic" title="GitHub" class="icon fa fa-github"></a>
+				<a href="https://linkedin.com/in/michaelhasselmann" title="LinkedIn" class="icon fa fa-linkedin"></a>
+				<a href="/feeds/atom.xml" title="Atom Feed" class="icon fa fa-feed"></a>
+			</div>
+
+			<hr id="sidebar-divider">
+		</aside>
+
+		<article>
+	<h1 class="title"><a href="/magical-controls.html" title="Permalink to What makes Control components so magical?">What makes Control components so magical?</a></h1>
+	<time class="date" datetime="2024-12-03 00:00:00+01:00">Tue 03 December 2024</time>
+	<div class="content">
+		
+<div class="section" id="problem-statement">
+<h2><a class="toc-backref" href="#toc-entry-1">Problem Statement</a></h2>
+<p>If you come from traditional UI toolkits such as GTK <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a> or Qt Widgets <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a>
+then the ultra-flexible way how QML lets you position items and deal with
+layouts will be confusing. First, there isn't just one way but several layout
+strategies to choose from:</p>
+<ul class="simple">
+<li>Direct positioning &amp; widget sizing (via <tt class="docutils literal">x</tt>, <tt class="docutils literal">y</tt>, <tt class="docutils literal">width</tt>, <tt class="docutils literal">height</tt> properties),</li>
+<li>Anchor layouts (<tt class="docutils literal">anchors { ... }</tt>),</li>
+<li>Positioner containers (<tt class="docutils literal">Flow</tt>, <tt class="docutils literal">Row</tt>, <tt class="docutils literal">Column</tt>, <tt class="docutils literal">Grid</tt>),</li>
+<li>Dynamic layout containers (<tt class="docutils literal">GridLayout</tt>, <tt class="docutils literal">RowLayout</tt>, <tt class="docutils literal">ColumnLayout</tt>),</li>
+<li>View containers (<tt class="docutils literal">ListView</tt>, <tt class="docutils literal">GridView</tt>, <tt class="docutils literal">ScrollView</tt>, ...).</li>
+</ul>
+<p>The first two operate on the <tt class="docutils literal">Item</tt> level, relative to their <tt class="docutils literal">parent</tt>,
+whereas the other three types operate as containers, meaning you can place
+items into them and they'll take care of the layout.</p>
+<p>This is all good and fine until you realize that there are hidden conflicts,
+depending on which layout strategies you use and mix. But it also depends on
+whether your components, custom or not, are well-behaved. In the best case,
+you'll run into binding loop warnings, and perhaps you'll ignore them (hint:
+Don't!). In the worst case, unhappy layouts crash your application. And you'll
+never quite sure whether a new Qt release will change these layout semantics
+(worst offender: Dynamic layout containers).</p>
+<p>Here's an example that shows how easy it is to create a binding loop:</p>
+<pre class="code qml literal-block">
+<span class="nx">ApplicationWindow</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="k">title:</span> <span class="s2">"Binding loop on implicitWidth"</span>
+    <span class="k">visible:</span> <span class="kc">true</span>
+
+    <span class="nx">ScrollView</span> <span class="p">{</span>
+        <span class="kd">id: view</span>
+
+        <span class="k">anchors.fill:</span> <span class="nx">parent</span>
+        <span class="k">contentWidth:</span> <span class="nx">view</span><span class="p">.</span><span class="nx">contentItem</span><span class="p">.</span><span class="nx">width</span> <span class="o">+</span> <span class="nx">view</span><span class="p">.</span><span class="nx">leftPadding</span> <span class="o">+</span> <span class="nx">view</span><span class="p">.</span><span class="nx">rightPadding</span>
+        <span class="k">leftPadding:</span> <span class="mi">6</span>
+        <span class="k">rightPadding:</span> <span class="mi">6</span>
+
+        <span class="nx">Item</span> <span class="p">{</span>
+            <span class="k">width:</span> <span class="nx">view</span><span class="p">.</span><span class="nx">width</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>When run, the QML engine will show you this warning:</p>
+<div class="highlight"><pre><span></span>QML ScrollView: Binding loop detected for property "implicitWidth"
+</pre></div>
+<p>Unless you understand what's going on, this error message can be quite
+misleading! After all, we didn't even touch the <tt class="docutils literal">ScrollView</tt>'s
+<tt class="docutils literal">implicitWidth</tt> property, and if we were to set it, the binding loop would
+magically disappear, too.</p>
+<p>Here's a conflict created by mixing Positioner containers and anchors:</p>
+<pre class="code qml literal-block">
+<span class="nx">ApplicationWindow</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="k">title:</span> <span class="s2">"Wrongly anchored Item inside a Row"</span>
+    <span class="k">visible:</span> <span class="kc">true</span>
+
+    <span class="nx">Row</span> <span class="p">{</span>
+        <span class="k">anchors.fill:</span> <span class="nx">parent</span>
+
+        <span class="nx">Item</span> <span class="p">{</span>
+            <span class="k">anchors.left:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">left</span>
+            <span class="k">width:</span> <span class="mi">60</span>
+            <span class="k">height:</span> <span class="mi">40</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>And that's the error we get, which at least is expected if you've read the
+documentation:</p>
+<div class="highlight"><pre><span></span>QML Row: Cannot specify left, right, horizontalCenter, fill or centerIn
+anchors for items inside Row. Row will not function.
+</pre></div>
+<p>Here's the dreaded <tt class="docutils literal">updatePolish()</tt> error that sends your application into a
+livelock:</p>
+<pre class="code qml literal-block">
+<span class="nx">ApplicationWindow</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="k">title:</span> <span class="s2">"Livelocked in updatePolish()"</span>
+    <span class="k">visible:</span> <span class="kc">true</span>
+
+    <span class="nx">ColumnLayout</span> <span class="p">{</span>
+        <span class="k">anchors.fill:</span> <span class="nx">parent</span>
+
+        <span class="nx">ColumnLayout</span> <span class="p">{</span>
+            <span class="k">implicitWidth:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">width</span>
+            <span class="k">implicitHeight:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">height</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="p">}</span>
+        <span class="nx">ColumnLayout</span> <span class="p">{</span>
+            <span class="k">implicitWidth:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">width</span>
+            <span class="k">implicitHeight:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">height</span> <span class="o">+</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">height</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="p">}</span>
+        <span class="nx">ColumnLayout</span> <span class="p">{</span>
+            <span class="k">implicitWidth:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">width</span>
+            <span class="k">implicitHeight:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">height</span> <span class="o">+</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">height</span> <span class="o">*</span> <span class="mi">5</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>Upon launching the app, you either get the error immediately or you'll see it
+after attempting to resize the application window:</p>
+<div class="highlight"><pre><span></span> QML ColumnLayout: possible QQuickItem::polish() loop
+ QML ColumnLayout: ColumnLayout called polish() inside updatePolish() of ColumnLayout
+(repeated)
+</pre></div>
+<p>What a bummer! Apparently we have to be careful in how we nest components, and
+which properties to bind. What if there was a component that could act as a
+<em>layout barrier</em>, reducing the risk of harmful layout interactions? Something
+that would look a bit like this:</p>
+<pre class="code qml literal-block">
+<span class="nx">ColumnLayout</span> <span class="p">{</span> <span class="c1">// outer layout, shielded from inner layout
+</span>    <span class="nx">SomeLayoutBarrier</span> <span class="p">{</span>
+        <span class="nx">Row</span> <span class="p">{</span> <span class="c1">// inner layout, shielded from outer layout
+</span>            <span class="p">...</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+</div>
+<div class="section" id="the-anatomy-of-control">
+<h2><a class="toc-backref" href="#toc-entry-2">The anatomy of <tt class="docutils literal">Control</tt></a></h2>
+<p><tt class="docutils literal">Control</tt> <a class="footnote-reference" href="#footnote-3" id="footnote-reference-3">[3]</a> fits the concept of a <em>layout barrier</em>, partially due to its
+well-behavedness. It's essentially three components rolled into one:</p>
+<ol class="arabic simple">
+<li><tt class="docutils literal">contentItem</tt> is where the content goes,</li>
+<li><tt class="docutils literal">background</tt> is mostly used for colouring,</li>
+<li><tt class="docutils literal">Control</tt> houses the other two and presents itself almost as a regular
+<tt class="docutils literal">Item</tt> to the parent component.</li>
+</ol>
+<p>Here is a simplified &amp; slightly wrong example illustrating the basic idea of
+the <tt class="docutils literal">Control</tt> component:</p>
+<pre class="code qml literal-block">
+<span class="nx">Item</span> <span class="p">{</span>
+    <span class="kd">id: control</span>
+
+    <span class="k">default</span> <span class="nx">property</span> <span class="nx">alias</span> <span class="k">contentData:</span> <span class="nx">contentItem</span><span class="p">.</span><span class="nx">data</span>
+    <span class="nx">property</span> <span class="nx">real</span> <span class="k">padding:</span> <span class="mi">0</span>
+
+    <span class="k">implicitWidth:</span> <span class="nx">background</span><span class="p">.</span><span class="nx">implicitWidth</span>
+    <span class="k">implicitHeight:</span> <span class="nx">background</span><span class="p">.</span><span class="nx">implicitHeight</span>
+
+    <span class="nx">Rectangle</span> <span class="p">{</span>
+        <span class="kd">id: background</span>
+
+        <span class="k">anchors.centerIn:</span> <span class="nx">parent</span>
+        <span class="k">implicitWidth:</span> <span class="mi">540</span>
+        <span class="k">implicitHeight:</span> <span class="mi">360</span>
+        <span class="k">color:</span> <span class="s2">"teal"</span>
+    <span class="p">}</span>
+    <span class="nx">Column</span> <span class="p">{</span>
+        <span class="kd">id: contentItem</span>
+
+        <span class="nx">anchors</span> <span class="p">{</span>
+            <span class="k">centerIn:</span> <span class="nx">parent</span>
+            <span class="k">margins:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">padding</span>
+        <span class="p">}</span>
+
+        <span class="nx">Text</span> <span class="p">{</span> <span class="k">text:</span> <span class="s2">"Hello there!"</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>The same example, but instead of a poorly handrolled version we now use the
+<tt class="docutils literal">Control</tt> component:</p>
+<pre class="code qml literal-block">
+<span class="nx">Control</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="k">background:</span> <span class="nx">Rectangle</span> <span class="p">{</span>
+        <span class="k">implicitWidth:</span> <span class="mi">540</span> <span class="o">+</span> <span class="nx">root</span><span class="p">.</span><span class="nx">leftInset</span> <span class="o">+</span> <span class="nx">root</span><span class="p">.</span><span class="nx">rightInset</span>
+        <span class="k">implicitHeight:</span> <span class="mi">360</span> <span class="o">+</span> <span class="nx">root</span><span class="p">.</span><span class="nx">topInset</span> <span class="o">+</span> <span class="nx">root</span><span class="p">.</span><span class="nx">bottomInset</span>
+        <span class="k">color:</span> <span class="s2">"teal"</span>
+    <span class="p">}</span>
+    <span class="k">contentItem:</span> <span class="nx">Column</span> <span class="p">{</span>
+        <span class="nx">Text</span> <span class="p">{</span> <span class="k">text:</span> <span class="s2">"Hello there!"</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>Not only results the reduction in boilerplate in much cleaner code, it's also
+more flexible, in a good way:</p>
+<ul class="simple">
+<li>Both <tt class="docutils literal">background</tt> and <tt class="docutils literal">contentItem</tt> are injectable and can be replaced
+for more customization,</li>
+<li>Implicit sizing (or <em>natural sizing</em>) is derived from the <tt class="docutils literal">background</tt> item
+(don't forget to account for the <tt class="docutils literal">{left, top, right, bottom}Inset</tt>
+properties),</li>
+<li>Explicit sizing is set on the <tt class="docutils literal">contentItem</tt> by the <tt class="docutils literal">Control</tt>, with no
+need to define anchors nor width or height for it,</li>
+<li>The <tt class="docutils literal">{left, top, right, bottom} x {Padding, Inset}</tt> cross product of
+properties can be used to add margins to either the <tt class="docutils literal">contentItem</tt> or the
+<tt class="docutils literal">background</tt> item.</li>
+</ul>
+<p>The clear semantics offered by <tt class="docutils literal">Control</tt> also makes for an extremely robust
+component when compared to <tt class="docutils literal">Item</tt> or some of QtQuick's <tt class="docutils literal">*View</tt> components.
+Neither <tt class="docutils literal">background</tt> nor <tt class="docutils literal">contentItem</tt> are <em>directly</em> affected by whatever
+layout strategy is used for the <tt class="docutils literal">Control</tt>. Conversely, whatever layout
+strategy is used for the <tt class="docutils literal">contentItem</tt>, its side effects are contained by the
+<tt class="docutils literal">Control</tt> itself.</p>
+<p>It's no surprise then that <tt class="docutils literal">Control</tt> is the base component for almost all
+widgets you can find in QtQuick2. The <tt class="docutils literal">contentItem</tt> property offers a great
+customization point for slightly quirky components such as the <tt class="docutils literal">Loader</tt>
+(strange anchor semantics) or the <tt class="docutils literal">ScrollView</tt> (strange implicit size
+semantics). Thus the containment effect helps us to wrap not-so-well-behaved
+components into properly well-behaving <tt class="docutils literal">Control</tt> components. This increases
+composability <em>and</em> lowers maintenance costs.</p>
+<p>The small overhead induced by the two extra components for each <tt class="docutils literal">Control</tt>
+encountered by the QML engine is a good trade-off to take.</p>
+</div>
+<div class="section" id="a-playground-for-control">
+<h2><a class="toc-backref" href="#toc-entry-3">A playground for <tt class="docutils literal">Control</tt></a></h2>
+<p>Building the proper intuition for <tt class="docutils literal">Control</tt> isn't easy; there is no
+replacement for playing with the component. Especially the multi-layered
+interactions of padding, inset, explicit size, implicit size and positioning
+can be confusing.</p>
+<p>So let's build a playground for ourselves to study the <tt class="docutils literal">Control</tt> component:</p>
+<pre class="code qml literal-block">
+<span class="nx">ApplicationWindow</span> <span class="p">{</span>
+    <span class="k">title:</span> <span class="s2">"Control, background &amp; contentItem"</span>
+    <span class="k">width:</span> <span class="mi">1280</span>
+    <span class="k">height:</span> <span class="mi">800</span>
+    <span class="k">visible:</span> <span class="kc">true</span>
+
+    <span class="nx">Column</span> <span class="p">{</span>
+        <span class="k">anchors.centerIn:</span> <span class="nx">parent</span>
+        <span class="k">spacing:</span> <span class="mi">24</span>
+
+        <span class="nx">Switch</span> <span class="p">{</span>
+            <span class="k">action:</span> <span class="nx">Action</span> <span class="p">{</span>
+              <span class="kd">id: enableClipping</span>
+
+              <span class="k">text:</span> <span class="s2">"Enable clipping"</span>
+              <span class="k">checked:</span> <span class="kc">false</span>
+              <span class="k">checkable:</span> <span class="kc">true</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="nx">SomeControl</span> <span class="p">{</span>
+            <span class="k">clip:</span> <span class="nx">enableClipping</span><span class="p">.</span><span class="nx">checked</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p><tt class="docutils literal">SomeControl</tt> will have handles on each edge of the <tt class="docutils literal">contentItem</tt> (shown in
+<em>orange</em>) and the <tt class="docutils literal">background</tt> (shown in <em>teal</em>) that we can drag to change
+either padding or inset properties. It'll also display the current geometry for
+both items. The geometry of the <tt class="docutils literal">Control</tt> is <em>not</em> affected by dragging the
+handles, which also explains the containment effect of our <em>layout barrier</em>:</p>
+<img alt="Dragging the handles reveals how everything interacts" src="images/qml-control/control-with-info.png"/>
+<p>The drag handles allow us to set negative values to each padding or inset
+property. When this happens, <tt class="docutils literal">SomeControl</tt> will paint outside its bounds. In
+QML, each item is responsible for painting itself properly. The QML engine will
+not enforce painting within bounds unless <tt class="docutils literal">clip: true</tt> is set. We use a
+switch to quickly see the effect of clipping vs. no-clip (default).</p>
+<p>We notice that changing the <tt class="docutils literal">leftPadding</tt> also changes <tt class="docutils literal">contentItem.x</tt>, on
+top of the width, and <tt class="docutils literal">topPadding</tt> affects <tt class="docutils literal">contentItem.y</tt> on top of the
+height. When <tt class="docutils literal">rightPadding</tt> or <tt class="docutils literal">bottomPadding</tt> is changed however, only the
+width and height of the <tt class="docutils literal">contentItem</tt> change. We can observe a similar effect
+for the <tt class="docutils literal">background</tt> when changing the insets.</p>
+<p>This is the basic structure of <tt class="docutils literal">SomeControl</tt>:</p>
+<pre class="code qml literal-block">
+<span class="nx">Control</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="k">background:</span> <span class="nx">Rectangle</span> <span class="p">{</span>
+        <span class="k">color:</span> <span class="s2">"teal"</span>
+        <span class="k">implicitWidth:</span> <span class="mi">640</span> <span class="o">-</span> <span class="nx">root</span><span class="p">.</span><span class="nx">leftInset</span> <span class="o">-</span> <span class="nx">root</span><span class="p">.</span><span class="nx">rightInset</span>
+        <span class="k">implicitHeight:</span> <span class="mi">360</span> <span class="o">-</span> <span class="nx">root</span><span class="p">.</span><span class="nx">topInset</span> <span class="o">-</span> <span class="nx">root</span><span class="p">.</span><span class="nx">bottomInset</span>
+
+    <span class="p">}</span>
+    <span class="k">contentItem:</span> <span class="nx">Rectangle</span> <span class="p">{</span>
+        <span class="k">color:</span> <span class="s2">"orange"</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>As mentioned before, we do not have to worry about explicit sizing for the
+Rectangle that is set as our <tt class="docutils literal">contentItem</tt>. The implicit (or <em>natural</em>)
+sizing however is informed by the <tt class="docutils literal">background</tt>, and we <em>are</em> responsible for
+mimicking the explicit size behaviour of the <tt class="docutils literal">contentItem</tt>.</p>
+<p>Q: What would happen if we had forgotten to substract the insets from
+<tt class="docutils literal">implicitWidth</tt> and <tt class="docutils literal">implicitHeight</tt>?</p>
+<p>A: The <tt class="docutils literal">background</tt>'s size would remain constant, meaning that changing the
+insets would result in moving the <tt class="docutils literal">background</tt>.</p>
+<p>You can experiment with the playground yourself, the full code example <a class="footnote-reference" href="#footnote-4" id="footnote-reference-4">[4]</a> is
+available on GitHub.</p>
+</div>
+<div class="section" id="references">
+<h2><a class="toc-backref" href="#toc-entry-4">References</a></h2>
+<table class="docutils footnote" frame="void" id="footnote-1" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-1">[1]</a></td><td><a class="reference external" href="https://www.gtk.org/">GTK</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-2" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-2">[2]</a></td><td><a class="reference external" href="https://doc.qt.io/qt-6/qtwidgets-index.html">Qt Widgets</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-3" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-3">[3]</a></td><td><a class="reference external" href="https://doc.qt.io/qt-6/qml-qtquick-controls-control.html">QML Control</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-4" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-4">[4]</a></td><td><a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-control">Code example on GitHub</a></td></tr>
+</tbody>
+</table>
+</div>
+
+	</div>
+
+	<div id="related-articles">
+		<a href="/zoomable-image.html" id="prev-neighbour">Implementing natural zoom for images &raquo;</a>
+	</div>
+
+			<hr>
+		</article>
+
+		<footer>
+			<p>&copy; 2024 Michael Hasselmann</p>
+		</footer>
+	</div>
+
+
+</body>
+</html>
