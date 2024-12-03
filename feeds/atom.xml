@@ -293,8 +293,11 @@ mimicking the explicit size behaviour of the &lt;tt class="docutils literal"&gt;
 &lt;p&gt;A: The &lt;tt class="docutils literal"&gt;background&lt;/tt&gt;'s size would remain constant, meaning that changing the
 insets would result in moving the &lt;tt class="docutils literal"&gt;background&lt;/tt&gt;.&lt;/p&gt;
 &lt;p&gt;You can experiment with the playground yourself, the full code example &lt;a class="footnote-reference" href="#footnote-4" id="footnote-reference-4"&gt;[4]&lt;/a&gt; is
-available on GitHub.&lt;/p&gt;
-&lt;/div&gt;
+available on GitHub. Here is a short video of the application:&lt;/p&gt;
+&lt;div style="margin-bottom:1.5em;width:100%;"&gt;
+&lt;video controls="" src="media/qml-control/control-behaviour.mp4" style="width:100%"&gt;&lt;/video&gt;
+&lt;strong&gt;Video:&lt;/strong&gt; Changing paddings and insets affetcs &lt;tt&gt;contentItem&lt;/tt&gt; and &lt;tt&gt;background&lt;/tt&gt;
+&lt;/div&gt;&lt;/div&gt;
 &lt;div class="section" id="references"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;References&lt;/a&gt;&lt;/h2&gt;
 &lt;table class="docutils footnote" frame="void" id="footnote-1" rules="none"&gt;
