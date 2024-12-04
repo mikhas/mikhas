@@ -29,7 +29,7 @@ depending on which layout strategies you use and mix. But it also depends on
 whether your components, custom or not, are well-behaved. In the best case,
 you'll run into binding loop warnings, and perhaps you'll ignore them (hint:
 Don't!). In the worst case, unhappy layouts crash your application. And you'll
-never quite sure whether a new Qt release will change these layout semantics
+never be quite sure whether a new Qt release will change these layout semantics
 (worst offender: Dynamic layout containers).&lt;/p&gt;
 &lt;p&gt;Here's an example that shows how easy it is to create a binding loop:&lt;/p&gt;
 &lt;pre class="code qml literal-block"&gt;
@@ -59,7 +59,7 @@ never quite sure whether a new Qt release will change these layout semantics
 &lt;p&gt;Unless you understand what's going on, this error message can be quite
 misleading! After all, we didn't even touch the &lt;tt class="docutils literal"&gt;ScrollView&lt;/tt&gt;'s
 &lt;tt class="docutils literal"&gt;implicitWidth&lt;/tt&gt; property, and if we were to set it, the binding loop would
-magically disappear, too.&lt;/p&gt;
+magically disappear.&lt;/p&gt;
 &lt;p&gt;Here's a conflict created by mixing Positioner containers and anchors:&lt;/p&gt;
 &lt;pre class="code qml literal-block"&gt;
 &lt;span class="nx"&gt;ApplicationWindow&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -189,8 +189,8 @@ the &lt;tt class="docutils literal"&gt;Control&lt;/tt&gt; component:&lt;/p&gt;
     &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;
-&lt;p&gt;Not only results the reduction in boilerplate in much cleaner code, it's also
-more flexible, in a good way:&lt;/p&gt;
+&lt;p&gt;Not only does the reduction in boilerplate result in much cleaner code, it also
+becomes more flexible, in a good way:&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;Both &lt;tt class="docutils literal"&gt;background&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;contentItem&lt;/tt&gt; are injectable and can be replaced
 for more customization,&lt;/li&gt;
@@ -198,7 +198,7 @@ for more customization,&lt;/li&gt;
 (don't forget to account for the &lt;tt class="docutils literal"&gt;{left, top, right, bottom}Inset&lt;/tt&gt;
 properties),&lt;/li&gt;
 &lt;li&gt;Explicit sizing is set on the &lt;tt class="docutils literal"&gt;contentItem&lt;/tt&gt; by the &lt;tt class="docutils literal"&gt;Control&lt;/tt&gt;, with no
-need to define anchors nor width or height for it,&lt;/li&gt;
+need to define anchors nor width or height ourselves,&lt;/li&gt;
 &lt;li&gt;The &lt;tt class="docutils literal"&gt;{left, top, right, bottom} x {Padding, Inset}&lt;/tt&gt; cross product of
 properties can be used to add margins to either the &lt;tt class="docutils literal"&gt;contentItem&lt;/tt&gt; or the
 &lt;tt class="docutils literal"&gt;background&lt;/tt&gt; item.&lt;/li&gt;
