@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic</title><link href="https://quitemeticulouslogic.com/" rel="alternate"></link><link href="https://quitemeticulouslogic.com/feeds/atom.xml" rel="self"></link><id>https://quitemeticulouslogic.com/</id><updated>2024-12-03T00:00:00+01:00</updated><entry><title>What makes Control components so magical?</title><link href="https://quitemeticulouslogic.com/magical-controls.html" rel="alternate"></link><published>2024-12-03T00:00:00+01:00</published><updated>2024-12-03T00:00:00+01:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2024-12-03:/magical-controls.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic</title><link href="https://quitemeticulouslogic.com/" rel="alternate"></link><link href="https://quitemeticulouslogic.com/feeds/atom.xml" rel="self"></link><id>https://quitemeticulouslogic.com/</id><updated>2024-12-04T00:00:00+01:00</updated><entry><title>What makes Control components so magical?</title><link href="https://quitemeticulouslogic.com/magical-controls.html" rel="alternate"></link><published>2024-12-03T00:00:00+01:00</published><updated>2024-12-04T00:00:00+01:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2024-12-03:/magical-controls.html</id><summary type="html">
 &lt;div class="section" id="problem-statement"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Problem Statement&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;If you come from traditional UI toolkits such as GTK &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt; or Qt Widgets &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt;
@@ -298,8 +298,18 @@ available on GitHub. Here is a short video of the application:&lt;/p&gt;
 &lt;video controls="" src="media/qml-control/control-behaviour.mp4" style="width:100%"&gt;&lt;/video&gt;
 &lt;strong&gt;Video:&lt;/strong&gt; Changing paddings and insets affetcs &lt;tt&gt;contentItem&lt;/tt&gt; and &lt;tt&gt;background&lt;/tt&gt;
 &lt;/div&gt;&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;We explored the &lt;tt class="docutils literal"&gt;Control&lt;/tt&gt; component under the aspect of common QML layout
+issues  and how to avoid them. Typical layout tasks can be simplified and its
+well-behavedness counters the side effects that are usually responsible for
+these issues. All that is required is to apply the patterns laid out for us,
+and to fully embrace the flexibility of the component. If done correctly, each
+&lt;tt class="docutils literal"&gt;Control&lt;/tt&gt; component becomes a &lt;em&gt;layout barrier&lt;/em&gt;, a concept &amp;amp; definition that
+we introduced in this article.&lt;/p&gt;
+&lt;/div&gt;
 &lt;div class="section" id="references"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;References&lt;/a&gt;&lt;/h2&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;References&lt;/a&gt;&lt;/h2&gt;
 &lt;table class="docutils footnote" frame="void" id="footnote-1" rules="none"&gt;
 &lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
 &lt;tbody valign="top"&gt;
