@@ -298,8 +298,8 @@ available on GitHub. Here is a short video of the application:&lt;/p&gt;
 &lt;video controls="" src="media/qml-control/control-behaviour.mp4" style="width:100%"&gt;&lt;/video&gt;
 &lt;strong&gt;Video:&lt;/strong&gt; Changing paddings and insets affetcs &lt;tt&gt;contentItem&lt;/tt&gt; and &lt;tt&gt;background&lt;/tt&gt;
 &lt;/div&gt;&lt;/div&gt;
-&lt;div class="section" id="conclusion"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="summary"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;Summary&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;We explored the &lt;tt class="docutils literal"&gt;Control&lt;/tt&gt; component under the aspect of common QML layout
 issues  and how to avoid them. Typical layout tasks can be simplified and its
 well-behavedness counters the side effects that are usually responsible for
