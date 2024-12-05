@@ -439,8 +439,8 @@ slot. This allows us to use the action decorator in a very natural way:&lt;/p&gt
 &lt;p&gt;The extra behaviour we want to run before the original action's &lt;tt class="docutils literal"&gt;onTriggered&lt;/tt&gt;
 slot is simply placed into the decorating action's own &lt;tt class="docutils literal"&gt;onTriggered&lt;/tt&gt; slot!&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class="section" id="conclusion"&gt;
-&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-7"&gt;Conclusion&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="summary"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-7"&gt;Summary&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;We've shown the usefulness of QML Actions in encapsulating behaviour that
 originates from user interactions. We also demonstrated that injectable actions
 improve our software design through better decoupling. Then we took a deeper
