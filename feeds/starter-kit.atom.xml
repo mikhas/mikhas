@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic - Starter Kit</title><link href="https://quitemeticulouslogic.com/" rel="alternate"></link><link href="https://quitemeticulouslogic.com/feeds/starter-kit.atom.xml" rel="self"></link><id>https://quitemeticulouslogic.com/</id><updated>2024-12-04T00:00:00+01:00</updated><entry><title>What makes Control components so magical?</title><link href="https://quitemeticulouslogic.com/magical-controls.html" rel="alternate"></link><published>2024-12-03T00:00:00+01:00</published><updated>2024-12-04T00:00:00+01:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2024-12-03:/magical-controls.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic - Starter Kit</title><link href="https://quitemeticulouslogic.com/" rel="alternate"></link><link href="https://quitemeticulouslogic.com/feeds/starter-kit.atom.xml" rel="self"></link><id>https://quitemeticulouslogic.com/</id><updated>2024-12-06T00:00:00+01:00</updated><entry><title>What makes Control components so magical?</title><link href="https://quitemeticulouslogic.com/magical-controls.html" rel="alternate"></link><published>2024-12-03T00:00:00+01:00</published><updated>2024-12-06T00:00:00+01:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2024-12-03:/magical-controls.html</id><summary type="html">
 &lt;div class="section" id="problem-statement"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Problem Statement&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;If you come from traditional UI toolkits such as GTK &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt; or Qt Widgets &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt;
-then the ultra-flexible way how QML lets you position items and deal with
+then the ultra-flexible way in how QML lets you position items and deal with
 layouts will be confusing. First, there isn't just one way but several layout
 strategies to choose from:&lt;/p&gt;
 &lt;ul class="simple"&gt;
-&lt;li&gt;Direct positioning &amp;amp; widget …&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;</summary><content type="html">
+&lt;li&gt;Direct positioning …&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;</summary><content type="html">
 &lt;div class="section" id="problem-statement"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Problem Statement&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;If you come from traditional UI toolkits such as GTK &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt; or Qt Widgets &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt;
-then the ultra-flexible way how QML lets you position items and deal with
+then the ultra-flexible way in how QML lets you position items and deal with
 layouts will be confusing. First, there isn't just one way but several layout
 strategies to choose from:&lt;/p&gt;
 &lt;ul class="simple"&gt;
