@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Basic Metas -->
+	<meta charset="utf-8">
+	<title>The Cascading UI Wireframe | Quite Meticulous Logic</title>
+	<meta name="description" content="Introduction How can we set up a project structure for a QML-heavy application that is easy to navigate for each team member, new or experienced? Something that can be intuitively understand by everyone contributing (yes, that includes your designers)? How do we decide what goes into a QML module? And …">
+	<meta name="author" content="">
+	<link rel="author" href=""/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<!-- Twitter Cards and Open Graph -->
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:creator" content="">
+	<meta name="twitter:domain" content="">
+	<meta name="twitter:site" content="">
+	<meta property="og:title" content="The Cascading UI Wireframe">
+	<meta property="og:description" content="Introduction How can we set up a project structure for a QML-heavy application that is easy to navigate for each team member, new or experienced? Something that can be intuitively understand by everyone contributing (yes, that includes your designers)? How do we decide what goes into a QML module? And …">
+	<meta property="og:image" content="https://quitemeticulouslogic.com/images/arch.jpeg">
+	<meta property="og:type" content="article">
+	<meta property="og:url" content="https://quitemeticulouslogic.com/cascading-ui-wireframe.html">
+
+	<!-- Stylesheets and Web Fonts -->
+	<link href="/theme/style.min.css?2bb90c7a" rel="stylesheet">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+	<!-- Favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="//apple-touch-icon.png">
+	<link rel="icon" type="image/png" href="//favicon-16x16.png" sizes="16x16">
+	<link rel="icon" type="image/png" href="//favicon-32x32.png" sizes="32x32">
+	<meta name="theme-color" content="">
+
+	<meta name="msapplication-TileColor" content="">
+	<meta name="msapplication-TileImage" content="//mstile-144x144.png">
+	<meta name="msapplication-square70x70logo" content="//mstile-small.png">
+	<meta name="msapplication-square150x150logo" content="//mstile-medium.png">
+	<meta name="msapplication-wide310x150logo" content="//mstile-wide.png">
+	<meta name="msapplication-square310x310logo" content="//mstile-large.png">
+
+	<!--[if lt IE 9]>
+	<script src="/theme/js/html5shiv.min.js"></script>
+	<script src="/theme/js/respond.min.js"></script>
+	<![endif]-->
+</head>
+
+<body>
+	<div class="container">
+		<aside>
+			<a href="/"><img id="avatar" alt="arch" src="/images/arch.jpeg"></a>
+			<div id="name"><a href="/">Quite Meticulous Logic</a></div>
+			<div id="bio">A blog about writing super tidy QML code, with a touch of model/view and Python on the side.</div>
+
+
+			<div id="social">
+				<a href="https://github.com/mikhas/quick-licks-of-magic" title="GitHub" class="icon fa fa-github"></a>
+				<a href="https://linkedin.com/in/michaelhasselmann" title="LinkedIn" class="icon fa fa-linkedin"></a>
+				<a href="/feeds/atom.xml" title="Atom Feed" class="icon fa fa-feed"></a>
+			</div>
+
+			<hr id="sidebar-divider">
+		</aside>
+
+		<article>
+	<h1 class="title"><a href="/cascading-ui-wireframe.html" title="Permalink to The Cascading UI Wireframe">The Cascading UI Wireframe</a></h1>
+	<time class="date" datetime="2025-01-06 00:00:00+01:00">Mon 06 January 2025</time>
+	<div class="content">
+		
+<div class="section" id="introduction">
+<h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
+<p>How can we set up a project structure for a QML-heavy application that is easy
+to navigate for each team member, new or experienced? Something that can be
+intuitively understand by everyone contributing (yes, that includes your
+designers)? How do we decide what goes into a QML module? And how many of those
+modules should we have?</p>
+<p>What I propose as a possible answer is a universal UI wireframe <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a> that has
+been frequently rediscovered. When followed everything else usually falls into
+place.</p>
+<p>Its roots can be traced back to at least the early 80s. It's been shown to be
+useful to a wide range of (desktop) applications. Yet due to its
+ubiquitousness, users will find the look &amp; feel familiar.</p>
+<p>Here's how it looks, in its abstract form:</p>
+<img alt="The Cascading UI Wireframe" src="images/qml-hierarchies/cascading-wireframe.png"/>
+</div>
+<div class="section" id="the-concept">
+<h2><a class="toc-backref" href="#toc-entry-2">The concept</a></h2>
+<p>I'd like to call this <em>The Cascading UI Wireframe</em>. Like a waterfall,
+navigation flows left to right. Each pane's interactive state controls what's
+displayed to the right of it. Conversely, the larger the impact of an action on
+the UI, the further the user has to move to the left to initiate it.</p>
+<p>A tree view navigating a directory structure for instance would affect what's
+shown in the details pane to the right.</p>
+<div class="section" id="examples">
+<h3><a class="toc-backref" href="#toc-entry-3">Examples</a></h3>
+<p>Microsoft's Outlook illustrates the concept well:</p>
+<img alt="Microsoft Outlook" src="images/qml-hierarchies/outlook-mailer.png"/>
+<p>Often the global pane is a collection of tool buttons or shortcuts that switch
+between different views. This isn't necessarily a violation, as long as
+interactions in one pane do not replace the contents of the pane to the <em>left</em>
+of it (or more precisely, the contents of a previous node in the navigation
+path).</p>
+<p>The file explorer on macOS ("Finder"), when switched to column view, offers a
+modern implementation, with the details pane showing a preview &amp; metadata of
+the selected file:</p>
+<img alt="macOS Finder" src="images/qml-hierarchies/macos-finder.png"/>
+<p>Smalltalk's System Browser is perhaps the earliest &amp; most principled example,
+but with the details pane moved below the navigation panes. Can you sense the
+similarities to macOS Finder's UI <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a>?</p>
+<img alt="Smalltalk System Browser" src="images/qml-hierarchies/smalltalk-system-browser.gif"/>
+<p>The navigation path rarely flows in a straight line. In the System Browser, the
+details pane is below the others. Yet the cascading effect is still
+recognisable.</p>
+<p>Here's a typical IDE, with two details panes showing source code:</p>
+<img alt="QtCreator" src="images/qml-hierarchies/qtcreator.png"/>
+<p>Tab views &amp; pull-down buttons <a class="footnote-reference" href="#footnote-3" id="footnote-reference-3">[3]</a> are used to arrange stacks of pages within
+the same pane, making efficient use of the available screen estate.</p>
+</div>
+<div class="section" id="benefits-of-the-cascading-ui-wireframe">
+<h3><a class="toc-backref" href="#toc-entry-4">Benefits of the Cascading UI Wireframe</a></h3>
+<ul class="simple">
+<li>A familiar user experience with bootstrapped design, at reduced costs.</li>
+<li>Proven UI layouts for a wide range of (desktop) applications.</li>
+<li>Easy to extend &amp; to accommodate new features.</li>
+<li>Panes can evolve independently.</li>
+</ul>
+<p>To illustrate the benefits we'll build a simplified email client in
+QML: We parse emails from the file system, show the inbox and display the
+currently opened email. Full email datasets can be found on the internet; I'll
+be using a dataset from 2002 that I found on Kaggle <a class="footnote-reference" href="#footnote-4" id="footnote-reference-4">[4]</a>. This is how it looks:</p>
+<img alt="Our mailer" src="images/qml-hierarchies/mailer.png"/>
+<p>Here's a video clip to demonstrate the implemented (and the missing) behaviour:</p>
+<div style="margin-bottom:1.5em;width:95%;margin:auto;">
+<video controls="" src="media/qml-hierarchies/pim.mp4" style="width:100%"></video>
+<strong>Video 1:</strong> Navigating &amp; reading emails
+</div></div>
+</div>
+<div class="section" id="a-layered-architecture-for-the-presentation-layer">
+<h2><a class="toc-backref" href="#toc-entry-5">A layered architecture for the presentation layer</a></h2>
+<p>The verticality derived from the semantics of our UI wireframe also informs our
+software design. Each cascading step can be mapped to a layer of UI components.</p>
+<p>At the top of the hierarchy, we'll find our <tt class="docutils literal">ApplicationWindow</tt> (in
+<tt class="docutils literal">Main.qml</tt>), housing the application menu, an optional footer &amp; our main
+layout, the UI <tt class="docutils literal">Canvas</tt>.</p>
+<div class="figure">
+<img alt="The first layer" src="images/qml-hierarchies/first-layer.png"/>
+<p class="caption">Our layers are organised as a flat list of directories within <tt class="docutils literal">MyApp/UI</tt>.</p>
+</div>
+<div class="figure">
+<img alt="How the first layer looks in the application" src="images/qml-hierarchies/first-layer-in-app.png"/>
+<p class="caption">How the application looks when limited to Layer 1: The Canvas remains empty.</p>
+</div>
+<p>Each layer only uses components from the layers below, or, even stricter, from
+the next layer beneath. If we want to use a sibling component from the same
+layer, we first have to resolve the conflict by moving the component A) to a
+layer below, B) its own layer, or C) by moving the using component up. Thus,
+each layer conflict is resolvable.</p>
+<p>Enforcing this rule is what makes our software design a layered system. Here's
+the essential definition <a class="footnote-reference" href="#footnote-5" id="footnote-reference-5">[5]</a>:</p>
+<blockquote>
+<p>In a layered system, each layer:</p>
+<ol class="arabic simple">
+<li>Depends on the layers beneath it;</li>
+<li>Is independent of the layers on top of it, having no knowledge of the layers using it.</li>
+</ol>
+</blockquote>
+<p>We already understand how this will lead to tidier QML components &amp; decreased
+coupling. The first point makes us factor out even small QML bits into their
+own components. This helps to avoid layer access violations. The second point
+requires us to be explicit about a component's dependencies. In general, this
+becomes simpler the smaller the components are, so there is a direct synergy
+with the first point. Thinking in terms of UI layers greatly helps us to decide
+when &amp; where to split components.</p>
+<p>In the following code listing, the import directive for <tt class="docutils literal">Layer1</tt> introduces a
+shortened namespace, <tt class="docutils literal">L1</tt>. Both components from that layer, <tt class="docutils literal">AppMenu</tt> and
+<tt class="docutils literal">Canvas</tt> that are used by <tt class="docutils literal">Main</tt> are prefixed accordingly:</p>
+<pre class="code qml literal-block">
+<span class="kr">import</span> <span class="nx">MyApp</span><span class="p">.</span><span class="nx">UI</span><span class="p">.</span><span class="nx">Layer1</span> <span class="nx">as</span> <span class="nx">L1</span>
+
+<span class="c1">// Main.qml
+</span><span class="nx">ApplicationWindow</span> <span class="p">{</span>
+    <span class="k">title:</span> <span class="s2">"QML Hierarchies"</span>
+    <span class="k">width:</span> <span class="mi">1280</span>
+    <span class="k">height:</span> <span class="mi">800</span>
+    <span class="k">visible:</span> <span class="kc">true</span>
+    <span class="k">menuBar:</span> <span class="nx">L1</span><span class="p">.</span><span class="nx">AppMenu</span> <span class="p">{}</span>
+
+    <span class="nx">L1</span><span class="p">.</span><span class="nx">Canvas</span> <span class="p">{</span> <span class="k">anchors.fill:</span> <span class="nx">parent</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>Let's drill down further into <tt class="docutils literal">MyApp.UI.Layer1.Canvas</tt>. Replacing the dots
+with slashes and adding the <tt class="docutils literal">.qml</tt> suffix yields the path &amp; file name,
+<tt class="docutils literal">MyApp/UI/Layer1/Canvas.qml</tt>:</p>
+<pre class="code qml literal-block">
+<span class="kr">import</span> <span class="nx">MyApp</span><span class="p">.</span><span class="nx">UI</span><span class="p">.</span><span class="nx">Layer2</span> <span class="nx">as</span> <span class="nx">L2</span>
+
+<span class="c1">// Layer1/Canvas.qml
+</span><span class="nx">Container</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="k">contentItem:</span> <span class="nx">RowLayout</span> <span class="p">{</span> <span class="k">spacing:</span> <span class="mi">0</span> <span class="p">}</span>
+
+    <span class="nx">L2</span><span class="p">.</span><span class="nx">ToolBar</span> <span class="p">{</span>
+        <span class="k">Layout.fillHeight:</span> <span class="kc">true</span>
+        <span class="k">topPadding:</span> <span class="mi">8</span>
+    <span class="p">}</span>
+    <span class="nx">L2</span><span class="p">.</span><span class="nx">ContentPane</span> <span class="p">{</span>
+        <span class="k">Layout.fillHeight:</span> <span class="kc">true</span>
+        <span class="k">Layout.fillWidth:</span> <span class="kc">true</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>Already we notice the shortness of the file. This is intentional as we follow a
+stricter separation of concerns. Next stop is <tt class="docutils literal">MyApp.UI.Layer2.ContentPane</tt>:</p>
+<pre class="code qml literal-block">
+<span class="kr">import</span> <span class="nx">MyApp</span><span class="p">.</span><span class="nx">UI</span><span class="p">.</span><span class="nx">Layer3</span> <span class="nx">as</span> <span class="nx">L3</span>
+
+<span class="c1">// Layer2/ContentPane.qml
+</span><span class="nx">Control</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="k">contentItem:</span> <span class="nx">SplitView</span> <span class="p">{</span>
+        <span class="nx">Column</span> <span class="p">{</span>
+            <span class="k">SplitView.preferredWidth:</span> <span class="nx">root</span><span class="p">.</span><span class="nx">contentItem</span><span class="p">.</span><span class="nx">width</span> <span class="o">*</span> <span class="p">.</span><span class="mi">35</span>
+
+            <span class="nx">L3</span><span class="p">.</span><span class="nx">InboxView</span> <span class="p">{</span>
+                <span class="kd">id: inbox</span>
+
+                <span class="k">width:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">width</span>
+                <span class="k">height:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">height</span> <span class="o">-</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">spacing</span> <span class="o">-</span> <span class="nx">status</span><span class="p">.</span><span class="nx">height</span>
+            <span class="p">}</span>
+            <span class="nx">L3</span><span class="p">.</span><span class="nx">InboxStatus</span> <span class="p">{</span>
+                <span class="kd">id: status</span>
+
+                <span class="k">width:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">width</span>
+                <span class="k">messageIndex:</span> <span class="nx">inbox</span><span class="p">.</span><span class="nx">currentIndex</span>
+                <span class="k">messageCount:</span> <span class="nx">inbox</span><span class="p">.</span><span class="nx">count</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="nx">L3</span><span class="p">.</span><span class="nx">MessageView</span> <span class="p">{</span>
+            <span class="k">model:</span> <span class="nx">inbox</span><span class="p">.</span><span class="nx">model</span>
+            <span class="k">currentIndex:</span> <span class="nx">inbox</span><span class="p">.</span><span class="nx">currentIndex</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>From the names alone, we know that we are getting closer to the core of
+business logic. Whereas the previous component names felt generic,
+<tt class="docutils literal">InboxView</tt>, <tt class="docutils literal">InboxStatus</tt> &amp; <tt class="docutils literal">MessageView</tt> provide us with concrete hints
+on what to expect. The inbox is implemented as a common <tt class="docutils literal">ListView</tt>, which, if
+done right, offers keyboard navigation out of the box.</p>
+<pre class="code qml literal-block">
+<span class="kr">import</span> <span class="nx">MyApp</span><span class="p">.</span><span class="nx">Backend</span> <span class="nx">as</span> <span class="nx">BE</span>
+<span class="kr">import</span> <span class="nx">MyApp</span><span class="p">.</span><span class="nx">UI</span><span class="p">.</span><span class="nx">Layer4</span> <span class="nx">as</span> <span class="nx">L4</span>
+
+<span class="c1">// Layer3/InboxView.qml
+</span><span class="nx">Control</span> <span class="p">{</span>
+    <span class="kd">id: root</span>
+
+    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">alias</span> <span class="k">model:</span> <span class="nx">view</span><span class="p">.</span><span class="nx">model</span>
+    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">alias</span> <span class="k">currentIndex:</span> <span class="nx">view</span><span class="p">.</span><span class="nx">currentIndex</span>
+    <span class="nx">readonly</span> <span class="nx">property</span> <span class="nx">alias</span> <span class="k">count:</span> <span class="nx">view</span><span class="p">.</span><span class="nx">count</span>
+
+    <span class="k">padding:</span> <span class="mi">8</span>
+    <span class="k">contentItem:</span> <span class="nx">ListView</span> <span class="p">{</span>
+        <span class="kd">id: view</span>
+
+        <span class="k">model:</span> <span class="nx">BE</span><span class="p">.</span><span class="nx">InboxModel</span> <span class="p">{</span> <span class="k">directory:</span> <span class="s2">"file:assets/inbox"</span> <span class="p">}</span>
+        <span class="k">clip:</span> <span class="kc">true</span>
+        <span class="k">focus:</span> <span class="kc">true</span>
+        <span class="k">highlight:</span> <span class="nx">L4</span><span class="p">.</span><span class="nx">ItemHighlight</span> <span class="p">{}</span>
+        <span class="k">highlightMoveDuration:</span> <span class="mi">120</span>
+        <span class="k">delegate:</span> <span class="nx">ItemDelegate</span> <span class="p">{</span>
+            <span class="nx">required</span> <span class="nx">property</span> <span class="kr">int</span> <span class="nx">index</span>
+            <span class="nx">required</span> <span class="nx">property</span> <span class="kd">var</span> <span class="nx">modelData</span>
+
+            <span class="k">width:</span> <span class="nx">view</span><span class="p">.</span><span class="nx">width</span>
+            <span class="k">action:</span> <span class="nx">Action</span> <span class="p">{</span>
+                <span class="k">onTriggered:</span> <span class="p">{</span>
+                    <span class="nx">view</span><span class="p">.</span><span class="nx">currentIndex</span> <span class="o">=</span> <span class="nx">index</span><span class="p">;</span>
+                    <span class="c1">// Allow the user to refocus our ListView by clicking on a delegate.
+</span>                    <span class="c1">// Focus can be lost through tab navigation, for instance.
+</span>                    <span class="nx">view</span><span class="p">.</span><span class="nx">focus</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="k">contentItem:</span> <span class="nx">L4</span><span class="p">.</span><span class="nx">MessageHeading</span> <span class="p">{</span>
+                <span class="k">message:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">modelData</span>
+                <span class="k">bold:</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">ListView</span><span class="p">.</span><span class="nx">isCurrentItem</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">ScrollBar.vertical:</span> <span class="nx">ScrollBar</span> <span class="p">{}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre>
+<p>That's it, that's all there is to our inbox! The <tt class="docutils literal">model</tt>,  <tt class="docutils literal">currentIndex</tt> &amp;
+<tt class="docutils literal">count</tt> ListView properties are depended on by other Layer3 components. They
+are wired together in a Layer2 component, the previously shown <tt class="docutils literal">ContentPane</tt>,
+thus ensuring layer access integrity.</p>
+<p>Notice how we wrapped the actual delegate item, <tt class="docutils literal">L4.MessageHeading</tt>, with an
+<tt class="docutils literal">ItemDelegate</tt>. This allows us to bake ListView-specific behaviour into the
+<tt class="docutils literal">InboxView</tt> instead of spreading it into <tt class="docutils literal">L4.MessageHeading</tt>, thus keeping
+it highly reusable.</p>
+<p>Even a small detail such as factoring out the highlight item into
+<tt class="docutils literal">L4.ItemHighlight</tt> improves readability of our <tt class="docutils literal">ListView</tt> implementation.
+As soon as the amount of details in our <tt class="docutils literal">InboxView</tt> drops below a certain
+threshold, the source code becomes trivial to read.</p>
+<div class="figure">
+<img alt="All layers" src="images/qml-hierarchies/all-layers.png"/>
+<p class="caption">All four layers in expanded view. Each layer forms its own module, with a dedicated <tt class="docutils literal">qmldir</tt>.</p>
+</div>
+<p>The inbox model is a <tt class="docutils literal">QAbstractItemModel</tt>, implemented in Python. It reads
+emails through Python's email module <a class="footnote-reference" href="#footnote-6" id="footnote-reference-6">[6]</a> which does all the parsing for us.
+Each message's headers and payload is then mapped to custom
+<tt class="docutils literal"><span class="pre">Qt::ItemDataRole</span></tt>'s before being transported to the UI as needed <a class="footnote-reference" href="#footnote-7" id="footnote-reference-7">[7]</a>.</p>
+<p>To speed up parsing we use Python's own <tt class="docutils literal">ProcessPoolExecutor</tt>. This also
+means we can launch the application sooner since the heavy lifting as been
+dispatched to a task queue.</p>
+<p>Once parsed, the results are copied a couple messages at a time into the model
+that is exposed to <tt class="docutils literal">InboxView</tt>. To keep the UI responsive, we copy in a
+periodically invoked slot (<tt class="docutils literal">Qtimer.singleShot</tt>). For about 6300 emails, this
+takes less than a second on a MacBook Pro M1.</p>
+<pre class="code Python literal-block">
+<span class="nd">@QmlElement</span><span class="w">
+</span><span class="k">class</span> <span class="nc">InboxModel</span><span class="p">(</span><span class="n">QAbstractItemModel</span><span class="p">):</span><span class="w">
+</span>    <span class="o">...</span><span class="w">
+
+</span>    <span class="k">def</span> <span class="nf">append_parsed_messages_from_task_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="w">
+</span>        <span class="k">try</span><span class="p">:</span><span class="w">
+</span>            <span class="n">begin</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages</span><span class="p">)</span><span class="w">
+</span>            <span class="n">next_messages</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pending_messages</span><span class="p">)</span><span class="w">
+</span>            <span class="n">end</span> <span class="o">=</span> <span class="n">begin</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_messages</span><span class="p">)</span><span class="w">
+
+</span>            <span class="bp">self</span><span class="o">.</span><span class="n">beginInsertRows</span><span class="p">(</span><span class="n">QModelIndex</span><span class="p">(),</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="w">
+</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">next_messages</span><span class="p">)</span><span class="w">
+</span>            <span class="bp">self</span><span class="o">.</span><span class="n">endInsertRows</span><span class="p">()</span><span class="w">
+
+</span>            <span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">append_parsed_messages_from_task_queue</span><span class="p">)</span><span class="w">
+</span>        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span><span class="w">
+</span>            <span class="k">pass</span><span class="w">
+
+</span>    <span class="nd">@Property</span><span class="p">(</span><span class="n">QUrl</span><span class="p">)</span><span class="w">
+</span>    <span class="k">def</span> <span class="nf">directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="w">
+</span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="w">
+
+</span>    <span class="nd">@directory</span><span class="o">.</span><span class="n">setter</span><span class="w">
+</span>    <span class="k">def</span> <span class="nf">directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="n">QUrl</span><span class="p">):</span><span class="w">
+</span>        <span class="o">...</span><span class="w">
+
+</span>        <span class="k">with</span> <span class="n">ProcessPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span><span class="w">
+</span>            <span class="n">files</span> <span class="o">=</span> <span class="n">chunk</span><span class="p">([</span><span class="n">fn</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()],</span> <span class="mi">64</span><span class="p">)</span><span class="w">
+</span>            <span class="bp">self</span><span class="o">.</span><span class="n">_pending_messages</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">parse_emails</span><span class="p">,</span> <span class="n">files</span><span class="p">)</span><span class="w">
+
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">append_parsed_messages_from_task_queue</span><span class="p">()</span><span class="w">
+
+</span>    <span class="o">...</span>
+</pre>
+<p>In total, our toy example tops out at around 500-600 lines of code, Python &amp;
+QML combined. The QML parts and how they are organised might serve as an
+inspiration for your next project. As usual, you'll find the complete example
+on GitHub <a class="footnote-reference" href="#footnote-8" id="footnote-reference-8">[8]</a>.</p>
+</div>
+<div class="section" id="references">
+<h2><a class="toc-backref" href="#toc-entry-6">References</a></h2>
+<table class="docutils footnote" frame="void" id="footnote-1" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-1">[1]</a></td><td><a class="reference external" href="https://www.interaction-design.org/literature/topics/wireframe#what_are_wireframes?-0">What are wireframes?</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-2" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-2">[2]</a></td><td><a class="reference external" href="https://spectrum.ieee.org/smalltalk">"Smalltalk Blew Steve Jobs’s Mind"</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-3" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-3">[3]</a></td><td>Apple HIG on <a class="reference external" href="https://developer.apple.com/design/human-interface-guidelines/tab-views">tab views</a>
+&amp; <a class="reference external" href="https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons">pull-down buttons</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-4" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-4">[4]</a></td><td>Download and move the <a class="reference external" href="https://www.kaggle.com/datasets/maharshipandya/email-spam-dataset-extended?resource=download">email dataset</a> contents from <tt class="docutils literal">ham_zipped/main_ham</tt> to the example project's <tt class="docutils literal">assets/inbox</tt> path.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-5" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-5">[5]</a></td><td><a class="reference external" href="https://herbertograca.com/2017/08/03/layered-architecture/">Layered system definition</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-6" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-6">[6]</a></td><td><a class="reference external" href="https://docs.python.org/3/library/email.examples.html">Python3 email module examples</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-7" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-7">[7]</a></td><td><a class="reference external" href="https://doc.qt.io/qt-6/qt.html#ItemDataRole-enum">QAbstractItemModel's Qt.ItemDataRole</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="footnote-8" rules="none">
+<colgroup><col class="label"/><col/></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-8">[8]</a></td><td><a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-hierarchies">Code example on GitHub</a></td></tr>
+</tbody>
+</table>
+</div>
+
+	</div>
+
+	<div id="related-articles">
+		<a href="/magical-controls.html" id="prev-neighbour">What makes Control components so magical? &raquo;</a>
+	</div>
+
+			<hr>
+		</article>
+
+		<footer>
+			<p>&copy; 2024 Michael Hasselmann</p>
+		</footer>
+	</div>
+
+
+</body>
+</html>

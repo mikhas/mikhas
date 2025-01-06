@@ -1,5 +1,356 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic</title><link href="https://quitemeticulouslogic.com/" rel="alternate"></link><link href="https://quitemeticulouslogic.com/feeds/atom.xml" rel="self"></link><id>https://quitemeticulouslogic.com/</id><updated>2024-12-06T00:00:00+01:00</updated><entry><title>What makes Control components so magical?</title><link href="https://quitemeticulouslogic.com/magical-controls.html" rel="alternate"></link><published>2024-12-03T00:00:00+01:00</published><updated>2024-12-06T00:00:00+01:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2024-12-03:/magical-controls.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Quite Meticulous Logic</title><link href="https://quitemeticulouslogic.com/" rel="alternate"></link><link href="https://quitemeticulouslogic.com/feeds/atom.xml" rel="self"></link><id>https://quitemeticulouslogic.com/</id><updated>2025-01-06T00:00:00+01:00</updated><entry><title>The Cascading UI Wireframe</title><link href="https://quitemeticulouslogic.com/cascading-ui-wireframe.html" rel="alternate"></link><published>2025-01-06T00:00:00+01:00</published><updated>2025-01-06T00:00:00+01:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2025-01-06:/cascading-ui-wireframe.html</id><summary type="html">
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;How can we set up a project structure for a QML-heavy application that is easy
+to navigate for each team member, new or experienced? Something that can be
+intuitively understand by everyone contributing (yes, that includes your
+designers)? How do we decide what goes into a QML module? And …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;How can we set up a project structure for a QML-heavy application that is easy
+to navigate for each team member, new or experienced? Something that can be
+intuitively understand by everyone contributing (yes, that includes your
+designers)? How do we decide what goes into a QML module? And how many of those
+modules should we have?&lt;/p&gt;
+&lt;p&gt;What I propose as a possible answer is a universal UI wireframe &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt; that has
+been frequently rediscovered. When followed everything else usually falls into
+place.&lt;/p&gt;
+&lt;p&gt;Its roots can be traced back to at least the early 80s. It's been shown to be
+useful to a wide range of (desktop) applications. Yet due to its
+ubiquitousness, users will find the look &amp;amp; feel familiar.&lt;/p&gt;
+&lt;p&gt;Here's how it looks, in its abstract form:&lt;/p&gt;
+&lt;img alt="The Cascading UI Wireframe" src="images/qml-hierarchies/cascading-wireframe.png"/&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-concept"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;The concept&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;I'd like to call this &lt;em&gt;The Cascading UI Wireframe&lt;/em&gt;. Like a waterfall,
+navigation flows left to right. Each pane's interactive state controls what's
+displayed to the right of it. Conversely, the larger the impact of an action on
+the UI, the further the user has to move to the left to initiate it.&lt;/p&gt;
+&lt;p&gt;A tree view navigating a directory structure for instance would affect what's
+shown in the details pane to the right.&lt;/p&gt;
+&lt;div class="section" id="examples"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;Examples&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Microsoft's Outlook illustrates the concept well:&lt;/p&gt;
+&lt;img alt="Microsoft Outlook" src="images/qml-hierarchies/outlook-mailer.png"/&gt;
+&lt;p&gt;Often the global pane is a collection of tool buttons or shortcuts that switch
+between different views. This isn't necessarily a violation, as long as
+interactions in one pane do not replace the contents of the pane to the &lt;em&gt;left&lt;/em&gt;
+of it (or more precisely, the contents of a previous node in the navigation
+path).&lt;/p&gt;
+&lt;p&gt;The file explorer on macOS ("Finder"), when switched to column view, offers a
+modern implementation, with the details pane showing a preview &amp;amp; metadata of
+the selected file:&lt;/p&gt;
+&lt;img alt="macOS Finder" src="images/qml-hierarchies/macos-finder.png"/&gt;
+&lt;p&gt;Smalltalk's System Browser is perhaps the earliest &amp;amp; most principled example,
+but with the details pane moved below the navigation panes. Can you sense the
+similarities to macOS Finder's UI &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt;?&lt;/p&gt;
+&lt;img alt="Smalltalk System Browser" src="images/qml-hierarchies/smalltalk-system-browser.gif"/&gt;
+&lt;p&gt;The navigation path rarely flows in a straight line. In the System Browser, the
+details pane is below the others. Yet the cascading effect is still
+recognisable.&lt;/p&gt;
+&lt;p&gt;Here's a typical IDE, with two details panes showing source code:&lt;/p&gt;
+&lt;img alt="QtCreator" src="images/qml-hierarchies/qtcreator.png"/&gt;
+&lt;p&gt;Tab views &amp;amp; pull-down buttons &lt;a class="footnote-reference" href="#footnote-3" id="footnote-reference-3"&gt;[3]&lt;/a&gt; are used to arrange stacks of pages within
+the same pane, making efficient use of the available screen estate.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="benefits-of-the-cascading-ui-wireframe"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;Benefits of the Cascading UI Wireframe&lt;/a&gt;&lt;/h3&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;A familiar user experience with bootstrapped design, at reduced costs.&lt;/li&gt;
+&lt;li&gt;Proven UI layouts for a wide range of (desktop) applications.&lt;/li&gt;
+&lt;li&gt;Easy to extend &amp;amp; to accommodate new features.&lt;/li&gt;
+&lt;li&gt;Panes can evolve independently.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To illustrate the benefits we'll build a simplified email client in
+QML: We parse emails from the file system, show the inbox and display the
+currently opened email. Full email datasets can be found on the internet; I'll
+be using a dataset from 2002 that I found on Kaggle &lt;a class="footnote-reference" href="#footnote-4" id="footnote-reference-4"&gt;[4]&lt;/a&gt;. This is how it looks:&lt;/p&gt;
+&lt;img alt="Our mailer" src="images/qml-hierarchies/mailer.png"/&gt;
+&lt;p&gt;Here's a video clip to demonstrate the implemented (and the missing) behaviour:&lt;/p&gt;
+&lt;div style="margin-bottom:1.5em;width:95%;margin:auto;"&gt;
+&lt;video controls="" src="media/qml-hierarchies/pim.mp4" style="width:100%"&gt;&lt;/video&gt;
+&lt;strong&gt;Video 1:&lt;/strong&gt; Navigating &amp;amp; reading emails
+&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-layered-architecture-for-the-presentation-layer"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;A layered architecture for the presentation layer&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The verticality derived from the semantics of our UI wireframe also informs our
+software design. Each cascading step can be mapped to a layer of UI components.&lt;/p&gt;
+&lt;p&gt;At the top of the hierarchy, we'll find our &lt;tt class="docutils literal"&gt;ApplicationWindow&lt;/tt&gt; (in
+&lt;tt class="docutils literal"&gt;Main.qml&lt;/tt&gt;), housing the application menu, an optional footer &amp;amp; our main
+layout, the UI &lt;tt class="docutils literal"&gt;Canvas&lt;/tt&gt;.&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="The first layer" src="images/qml-hierarchies/first-layer.png"/&gt;
+&lt;p class="caption"&gt;Our layers are organised as a flat list of directories within &lt;tt class="docutils literal"&gt;MyApp/UI&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="How the first layer looks in the application" src="images/qml-hierarchies/first-layer-in-app.png"/&gt;
+&lt;p class="caption"&gt;How the application looks when limited to Layer 1: The Canvas remains empty.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Each layer only uses components from the layers below, or, even stricter, from
+the next layer beneath. If we want to use a sibling component from the same
+layer, we first have to resolve the conflict by moving the component A) to a
+layer below, B) its own layer, or C) by moving the using component up. Thus,
+each layer conflict is resolvable.&lt;/p&gt;
+&lt;p&gt;Enforcing this rule is what makes our software design a layered system. Here's
+the essential definition &lt;a class="footnote-reference" href="#footnote-5" id="footnote-reference-5"&gt;[5]&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In a layered system, each layer:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Depends on the layers beneath it;&lt;/li&gt;
+&lt;li&gt;Is independent of the layers on top of it, having no knowledge of the layers using it.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;We already understand how this will lead to tidier QML components &amp;amp; decreased
+coupling. The first point makes us factor out even small QML bits into their
+own components. This helps to avoid layer access violations. The second point
+requires us to be explicit about a component's dependencies. In general, this
+becomes simpler the smaller the components are, so there is a direct synergy
+with the first point. Thinking in terms of UI layers greatly helps us to decide
+when &amp;amp; where to split components.&lt;/p&gt;
+&lt;p&gt;In the following code listing, the import directive for &lt;tt class="docutils literal"&gt;Layer1&lt;/tt&gt; introduces a
+shortened namespace, &lt;tt class="docutils literal"&gt;L1&lt;/tt&gt;. Both components from that layer, &lt;tt class="docutils literal"&gt;AppMenu&lt;/tt&gt; and
+&lt;tt class="docutils literal"&gt;Canvas&lt;/tt&gt; that are used by &lt;tt class="docutils literal"&gt;Main&lt;/tt&gt; are prefixed accordingly:&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;MyApp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;UI&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Layer1&lt;/span&gt; &lt;span class="nx"&gt;as&lt;/span&gt; &lt;span class="nx"&gt;L1&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Main.qml
+&lt;/span&gt;&lt;span class="nx"&gt;ApplicationWindow&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;title:&lt;/span&gt; &lt;span class="s2"&gt;"QML Hierarchies"&lt;/span&gt;
+    &lt;span class="k"&gt;width:&lt;/span&gt; &lt;span class="mi"&gt;1280&lt;/span&gt;
+    &lt;span class="k"&gt;height:&lt;/span&gt; &lt;span class="mi"&gt;800&lt;/span&gt;
+    &lt;span class="k"&gt;visible:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+    &lt;span class="k"&gt;menuBar:&lt;/span&gt; &lt;span class="nx"&gt;L1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;AppMenu&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+
+    &lt;span class="nx"&gt;L1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Canvas&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;anchors.fill:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Let's drill down further into &lt;tt class="docutils literal"&gt;MyApp.UI.Layer1.Canvas&lt;/tt&gt;. Replacing the dots
+with slashes and adding the &lt;tt class="docutils literal"&gt;.qml&lt;/tt&gt; suffix yields the path &amp;amp; file name,
+&lt;tt class="docutils literal"&gt;MyApp/UI/Layer1/Canvas.qml&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;MyApp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;UI&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Layer2&lt;/span&gt; &lt;span class="nx"&gt;as&lt;/span&gt; &lt;span class="nx"&gt;L2&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Layer1/Canvas.qml
+&lt;/span&gt;&lt;span class="nx"&gt;Container&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;id: root&lt;/span&gt;
+
+    &lt;span class="k"&gt;contentItem:&lt;/span&gt; &lt;span class="nx"&gt;RowLayout&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;spacing:&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+
+    &lt;span class="nx"&gt;L2&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ToolBar&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;Layout.fillHeight:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+        &lt;span class="k"&gt;topPadding:&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="nx"&gt;L2&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ContentPane&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;Layout.fillHeight:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+        &lt;span class="k"&gt;Layout.fillWidth:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Already we notice the shortness of the file. This is intentional as we follow a
+stricter separation of concerns. Next stop is &lt;tt class="docutils literal"&gt;MyApp.UI.Layer2.ContentPane&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;MyApp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;UI&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Layer3&lt;/span&gt; &lt;span class="nx"&gt;as&lt;/span&gt; &lt;span class="nx"&gt;L3&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Layer2/ContentPane.qml
+&lt;/span&gt;&lt;span class="nx"&gt;Control&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;id: root&lt;/span&gt;
+
+    &lt;span class="k"&gt;contentItem:&lt;/span&gt; &lt;span class="nx"&gt;SplitView&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;Column&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;SplitView.preferredWidth:&lt;/span&gt; &lt;span class="nx"&gt;root&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;contentItem&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;35&lt;/span&gt;
+
+            &lt;span class="nx"&gt;L3&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;InboxView&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="kd"&gt;id: inbox&lt;/span&gt;
+
+                &lt;span class="k"&gt;width:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt;
+                &lt;span class="k"&gt;height:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;height&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;spacing&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="nx"&gt;status&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;height&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="nx"&gt;L3&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;InboxStatus&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="kd"&gt;id: status&lt;/span&gt;
+
+                &lt;span class="k"&gt;width:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt;
+                &lt;span class="k"&gt;messageIndex:&lt;/span&gt; &lt;span class="nx"&gt;inbox&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;currentIndex&lt;/span&gt;
+                &lt;span class="k"&gt;messageCount:&lt;/span&gt; &lt;span class="nx"&gt;inbox&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;count&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="nx"&gt;L3&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MessageView&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;model:&lt;/span&gt; &lt;span class="nx"&gt;inbox&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;model&lt;/span&gt;
+            &lt;span class="k"&gt;currentIndex:&lt;/span&gt; &lt;span class="nx"&gt;inbox&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;currentIndex&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;From the names alone, we know that we are getting closer to the core of
+business logic. Whereas the previous component names felt generic,
+&lt;tt class="docutils literal"&gt;InboxView&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;InboxStatus&lt;/tt&gt; &amp;amp; &lt;tt class="docutils literal"&gt;MessageView&lt;/tt&gt; provide us with concrete hints
+on what to expect. The inbox is implemented as a common &lt;tt class="docutils literal"&gt;ListView&lt;/tt&gt;, which, if
+done right, offers keyboard navigation out of the box.&lt;/p&gt;
+&lt;pre class="code qml literal-block"&gt;
+&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;MyApp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Backend&lt;/span&gt; &lt;span class="nx"&gt;as&lt;/span&gt; &lt;span class="nx"&gt;BE&lt;/span&gt;
+&lt;span class="kr"&gt;import&lt;/span&gt; &lt;span class="nx"&gt;MyApp&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;UI&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Layer4&lt;/span&gt; &lt;span class="nx"&gt;as&lt;/span&gt; &lt;span class="nx"&gt;L4&lt;/span&gt;
+
+&lt;span class="c1"&gt;// Layer3/InboxView.qml
+&lt;/span&gt;&lt;span class="nx"&gt;Control&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;id: root&lt;/span&gt;
+
+    &lt;span class="nx"&gt;readonly&lt;/span&gt; &lt;span class="nx"&gt;property&lt;/span&gt; &lt;span class="nx"&gt;alias&lt;/span&gt; &lt;span class="k"&gt;model:&lt;/span&gt; &lt;span class="nx"&gt;view&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;model&lt;/span&gt;
+    &lt;span class="nx"&gt;readonly&lt;/span&gt; &lt;span class="nx"&gt;property&lt;/span&gt; &lt;span class="nx"&gt;alias&lt;/span&gt; &lt;span class="k"&gt;currentIndex:&lt;/span&gt; &lt;span class="nx"&gt;view&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;currentIndex&lt;/span&gt;
+    &lt;span class="nx"&gt;readonly&lt;/span&gt; &lt;span class="nx"&gt;property&lt;/span&gt; &lt;span class="nx"&gt;alias&lt;/span&gt; &lt;span class="k"&gt;count:&lt;/span&gt; &lt;span class="nx"&gt;view&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;count&lt;/span&gt;
+
+    &lt;span class="k"&gt;padding:&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;
+    &lt;span class="k"&gt;contentItem:&lt;/span&gt; &lt;span class="nx"&gt;ListView&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="kd"&gt;id: view&lt;/span&gt;
+
+        &lt;span class="k"&gt;model:&lt;/span&gt; &lt;span class="nx"&gt;BE&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;InboxModel&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;directory:&lt;/span&gt; &lt;span class="s2"&gt;"file:assets/inbox"&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="k"&gt;clip:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+        &lt;span class="k"&gt;focus:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+        &lt;span class="k"&gt;highlight:&lt;/span&gt; &lt;span class="nx"&gt;L4&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ItemHighlight&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+        &lt;span class="k"&gt;highlightMoveDuration:&lt;/span&gt; &lt;span class="mi"&gt;120&lt;/span&gt;
+        &lt;span class="k"&gt;delegate:&lt;/span&gt; &lt;span class="nx"&gt;ItemDelegate&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nx"&gt;required&lt;/span&gt; &lt;span class="nx"&gt;property&lt;/span&gt; &lt;span class="kr"&gt;int&lt;/span&gt; &lt;span class="nx"&gt;index&lt;/span&gt;
+            &lt;span class="nx"&gt;required&lt;/span&gt; &lt;span class="nx"&gt;property&lt;/span&gt; &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;modelData&lt;/span&gt;
+
+            &lt;span class="k"&gt;width:&lt;/span&gt; &lt;span class="nx"&gt;view&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;width&lt;/span&gt;
+            &lt;span class="k"&gt;action:&lt;/span&gt; &lt;span class="nx"&gt;Action&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="k"&gt;onTriggered:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                    &lt;span class="nx"&gt;view&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;currentIndex&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;index&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+                    &lt;span class="c1"&gt;// Allow the user to refocus our ListView by clicking on a delegate.
+&lt;/span&gt;                    &lt;span class="c1"&gt;// Focus can be lost through tab navigation, for instance.
+&lt;/span&gt;                    &lt;span class="nx"&gt;view&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;focus&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+                &lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="k"&gt;contentItem:&lt;/span&gt; &lt;span class="nx"&gt;L4&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;MessageHeading&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="k"&gt;message:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;modelData&lt;/span&gt;
+                &lt;span class="k"&gt;bold:&lt;/span&gt; &lt;span class="nx"&gt;parent&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ListView&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;isCurrentItem&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="k"&gt;ScrollBar.vertical:&lt;/span&gt; &lt;span class="nx"&gt;ScrollBar&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;That's it, that's all there is to our inbox! The &lt;tt class="docutils literal"&gt;model&lt;/tt&gt;,  &lt;tt class="docutils literal"&gt;currentIndex&lt;/tt&gt; &amp;amp;
+&lt;tt class="docutils literal"&gt;count&lt;/tt&gt; ListView properties are depended on by other Layer3 components. They
+are wired together in a Layer2 component, the previously shown &lt;tt class="docutils literal"&gt;ContentPane&lt;/tt&gt;,
+thus ensuring layer access integrity.&lt;/p&gt;
+&lt;p&gt;Notice how we wrapped the actual delegate item, &lt;tt class="docutils literal"&gt;L4.MessageHeading&lt;/tt&gt;, with an
+&lt;tt class="docutils literal"&gt;ItemDelegate&lt;/tt&gt;. This allows us to bake ListView-specific behaviour into the
+&lt;tt class="docutils literal"&gt;InboxView&lt;/tt&gt; instead of spreading it into &lt;tt class="docutils literal"&gt;L4.MessageHeading&lt;/tt&gt;, thus keeping
+it highly reusable.&lt;/p&gt;
+&lt;p&gt;Even a small detail such as factoring out the highlight item into
+&lt;tt class="docutils literal"&gt;L4.ItemHighlight&lt;/tt&gt; improves readability of our &lt;tt class="docutils literal"&gt;ListView&lt;/tt&gt; implementation.
+As soon as the amount of details in our &lt;tt class="docutils literal"&gt;InboxView&lt;/tt&gt; drops below a certain
+threshold, the source code becomes trivial to read.&lt;/p&gt;
+&lt;div class="figure"&gt;
+&lt;img alt="All layers" src="images/qml-hierarchies/all-layers.png"/&gt;
+&lt;p class="caption"&gt;All four layers in expanded view. Each layer forms its own module, with a dedicated &lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;The inbox model is a &lt;tt class="docutils literal"&gt;QAbstractItemModel&lt;/tt&gt;, implemented in Python. It reads
+emails through Python's email module &lt;a class="footnote-reference" href="#footnote-6" id="footnote-reference-6"&gt;[6]&lt;/a&gt; which does all the parsing for us.
+Each message's headers and payload is then mapped to custom
+&lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Qt::ItemDataRole&lt;/span&gt;&lt;/tt&gt;'s before being transported to the UI as needed &lt;a class="footnote-reference" href="#footnote-7" id="footnote-reference-7"&gt;[7]&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To speed up parsing we use Python's own &lt;tt class="docutils literal"&gt;ProcessPoolExecutor&lt;/tt&gt;. This also
+means we can launch the application sooner since the heavy lifting as been
+dispatched to a task queue.&lt;/p&gt;
+&lt;p&gt;Once parsed, the results are copied a couple messages at a time into the model
+that is exposed to &lt;tt class="docutils literal"&gt;InboxView&lt;/tt&gt;. To keep the UI responsive, we copy in a
+periodically invoked slot (&lt;tt class="docutils literal"&gt;Qtimer.singleShot&lt;/tt&gt;). For about 6300 emails, this
+takes less than a second on a MacBook Pro M1.&lt;/p&gt;
+&lt;pre class="code Python literal-block"&gt;
+&lt;span class="nd"&gt;@QmlElement&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;InboxModel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QAbstractItemModel&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;append_parsed_messages_from_task_queue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;        &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;            &lt;span class="n"&gt;begin&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_messages&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;            &lt;span class="n"&gt;next_messages&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;next&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_pending_messages&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;            &lt;span class="n"&gt;end&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;begin&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;next_messages&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;beginInsertRows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QModelIndex&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="n"&gt;begin&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_messages&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;extend&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;next_messages&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;endInsertRows&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;            &lt;span class="n"&gt;QTimer&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;singleShot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append_parsed_messages_from_task_queue&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;        &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;StopIteration&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;            &lt;span class="k"&gt;pass&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;    &lt;span class="nd"&gt;@Property&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;directory&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_directory&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;    &lt;span class="nd"&gt;@directory&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setter&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;directory&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;QUrl&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;        &lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;        &lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="n"&gt;ProcessPoolExecutor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;max_workers&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;executor&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;            &lt;span class="n"&gt;files&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;chunk&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;fn&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;fn&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;iterdir&lt;/span&gt;&lt;span class="p"&gt;()],&lt;/span&gt; &lt;span class="mi"&gt;64&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_pending_messages&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;executor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;map&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;parse_emails&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;files&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append_parsed_messages_from_task_queue&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt;
+
+&lt;/span&gt;    &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;In total, our toy example tops out at around 500-600 lines of code, Python &amp;amp;
+QML combined. The QML parts and how they are organised might serve as an
+inspiration for your next project. As usual, you'll find the complete example
+on GitHub &lt;a class="footnote-reference" href="#footnote-8" id="footnote-reference-8"&gt;[8]&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-6"&gt;References&lt;/a&gt;&lt;/h2&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-1" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-1"&gt;[1]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://www.interaction-design.org/literature/topics/wireframe#what_are_wireframes?-0"&gt;What are wireframes?&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-2" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-2"&gt;[2]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://spectrum.ieee.org/smalltalk"&gt;"Smalltalk Blew Steve Jobs’s Mind"&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-3" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-3"&gt;[3]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Apple HIG on &lt;a class="reference external" href="https://developer.apple.com/design/human-interface-guidelines/tab-views"&gt;tab views&lt;/a&gt;
+&amp;amp; &lt;a class="reference external" href="https://developer.apple.com/design/human-interface-guidelines/pull-down-buttons"&gt;pull-down buttons&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-4" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-4"&gt;[4]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Download and move the &lt;a class="reference external" href="https://www.kaggle.com/datasets/maharshipandya/email-spam-dataset-extended?resource=download"&gt;email dataset&lt;/a&gt; contents from &lt;tt class="docutils literal"&gt;ham_zipped/main_ham&lt;/tt&gt; to the example project's &lt;tt class="docutils literal"&gt;assets/inbox&lt;/tt&gt; path.&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-5" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-5"&gt;[5]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://herbertograca.com/2017/08/03/layered-architecture/"&gt;Layered system definition&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-6" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-6"&gt;[6]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://docs.python.org/3/library/email.examples.html"&gt;Python3 email module examples&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-7" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-7"&gt;[7]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://doc.qt.io/qt-6/qt.html#ItemDataRole-enum"&gt;QAbstractItemModel's Qt.ItemDataRole&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table class="docutils footnote" frame="void" id="footnote-8" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label"/&gt;&lt;col/&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#footnote-reference-8"&gt;[8]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a class="reference external" href="https://github.com/mikhas/quick-licks-of-magic/tree/main/src/qml-hierarchies"&gt;Code example on GitHub&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+</content><category term="Software Design"></category><category term="QML"></category></entry><entry><title>What makes Control components so magical?</title><link href="https://quitemeticulouslogic.com/magical-controls.html" rel="alternate"></link><published>2024-12-03T00:00:00+01:00</published><updated>2024-12-06T00:00:00+01:00</updated><author><name>Michael Hasselmann</name></author><id>tag:quitemeticulouslogic.com,2024-12-03:/magical-controls.html</id><summary type="html">
 &lt;div class="section" id="problem-statement"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Problem Statement&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;If you come from traditional UI toolkits such as GTK &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt; or Qt Widgets &lt;a class="footnote-reference" href="#footnote-2" id="footnote-reference-2"&gt;[2]&lt;/a&gt;
