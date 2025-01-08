@@ -314,7 +314,7 @@ emails through Python's email module <a class="footnote-reference" href="#footno
 Each message's headers and payload is then mapped to custom
 <tt class="docutils literal"><span class="pre">Qt::ItemDataRole</span></tt>'s before being transported to the UI as needed <a class="footnote-reference" href="#footnote-7" id="footnote-reference-7">[7]</a>.</p>
 <p>To speed up parsing we use Python's own <tt class="docutils literal">ProcessPoolExecutor</tt>. This also
-means we can launch the application sooner since the heavy lifting as been
+means we can launch the application sooner since the heavy lifting has been
 dispatched to a task queue.</p>
 <p>Once parsed, the results are copied a couple messages at a time into the model
 that is exposed to <tt class="docutils literal">InboxView</tt>. To keep the UI responsive, we copy in a
