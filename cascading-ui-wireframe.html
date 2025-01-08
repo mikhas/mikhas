@@ -4,7 +4,7 @@
 	<!-- Basic Metas -->
 	<meta charset="utf-8">
 	<title>The Cascading UI Wireframe | Quite Meticulous Logic</title>
-	<meta name="description" content="Introduction How can we set up a project structure for a QML-heavy application that is easy to navigate for each team member, new or experienced? Something that can be intuitively understand by everyone contributing (yes, that includes your designers)? How do we decide what goes into a QML module? And …">
+	<meta name="description" content="Introduction How can we set up a project structure for a QML-heavy application that is easy to navigate for each team member, regardless of experience level? Something that can be intuitively understood by every contributor, including designers and product owners? Also, how should we decide what goes into a QML …">
 	<meta name="author" content="">
 	<link rel="author" href=""/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -15,7 +15,7 @@
 	<meta name="twitter:domain" content="">
 	<meta name="twitter:site" content="">
 	<meta property="og:title" content="The Cascading UI Wireframe">
-	<meta property="og:description" content="Introduction How can we set up a project structure for a QML-heavy application that is easy to navigate for each team member, new or experienced? Something that can be intuitively understand by everyone contributing (yes, that includes your designers)? How do we decide what goes into a QML module? And …">
+	<meta property="og:description" content="Introduction How can we set up a project structure for a QML-heavy application that is easy to navigate for each team member, regardless of experience level? Something that can be intuitively understood by every contributor, including designers and product owners? Also, how should we decide what goes into a QML …">
 	<meta property="og:image" content="https://quitemeticulouslogic.com/images/arch.jpeg">
 	<meta property="og:type" content="article">
 	<meta property="og:url" content="https://quitemeticulouslogic.com/cascading-ui-wireframe.html">
@@ -68,22 +68,23 @@
 <div class="section" id="introduction">
 <h2><a class="toc-backref" href="#toc-entry-1">Introduction</a></h2>
 <p>How can we set up a project structure for a QML-heavy application that is easy
-to navigate for each team member, new or experienced? Something that can be
-intuitively understand by everyone contributing (yes, that includes your
-designers)? How do we decide what goes into a QML module? And how many of those
-modules should we have?</p>
-<p>What I propose as a possible answer is a universal UI wireframe <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a> that has
-been frequently rediscovered. When followed everything else usually falls into
-place.</p>
-<p>Its roots can be traced back to at least the early 80s. It's been shown to be
-useful to a wide range of (desktop) applications. Yet due to its
-ubiquitousness, users will find the look &amp; feel familiar.</p>
+to navigate for each team member, regardless of experience level? Something
+that can be intuitively understood by every contributor, including designers
+and product owners?</p>
+<p>Also, how should we decide what goes into a QML module? And how many of those
+modules are needed?</p>
+<p>What I propose as a possible answer to all of the above is a universal UI
+wireframe <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a> that has often been rediscovered. When followed &amp; applied
+correctly, everything else will fall into place.</p>
+<p>Its roots can be traced back to at least the early 80s. It has proven to be
+useful to a wide range of (desktop) applications. Due to its ubiquitousness,
+users will find the look &amp; feel familiar.</p>
 <p>Here's how it looks, in its abstract form:</p>
 <img alt="The Cascading UI Wireframe" src="images/qml-hierarchies/cascading-wireframe.png"/>
 </div>
 <div class="section" id="the-concept">
 <h2><a class="toc-backref" href="#toc-entry-2">The concept</a></h2>
-<p>I'd like to call this <em>The Cascading UI Wireframe</em>. Like a waterfall,
+<p>I'd like to call this <em>The Cascading UI Wireframe</em>. Like steps in a waterfall,
 navigation flows left to right. Each pane's interactive state controls what's
 displayed to the right of it. Conversely, the larger the impact of an action on
 the UI, the further the user has to move to the left to initiate it.</p>
@@ -169,6 +170,8 @@ requires us to be explicit about a component's dependencies. In general, this
 becomes simpler the smaller the components are, so there is a direct synergy
 with the first point. Thinking in terms of UI layers greatly helps us to decide
 when &amp; where to split components.</p>
+<p>Each layer maps to one QML module with a dedicated <tt class="docutils literal">qmldir</tt> file, so even
+with many small QML components, our project structure won't feel crowded.</p>
 <p>In the following code listing, the import directive for <tt class="docutils literal">Layer1</tt> introduces a
 shortened namespace, <tt class="docutils literal">L1</tt>. Both components from that layer, <tt class="docutils literal">AppMenu</tt> and
 <tt class="docutils literal">Canvas</tt> that are used by <tt class="docutils literal">Main</tt> are prefixed accordingly:</p>

@@ -3,28 +3,30 @@
 &lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;How can we set up a project structure for a QML-heavy application that is easy
-to navigate for each team member, new or experienced? Something that can be
-intuitively understand by everyone contributing (yes, that includes your
-designers)? How do we decide what goes into a QML module? And …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
+to navigate for each team member, regardless of experience level? Something
+that can be intuitively understood by every contributor, including designers
+and product owners?&lt;/p&gt;
+&lt;p&gt;Also, how should we decide what goes into a QML …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">
 &lt;div class="section" id="introduction"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;Introduction&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;How can we set up a project structure for a QML-heavy application that is easy
-to navigate for each team member, new or experienced? Something that can be
-intuitively understand by everyone contributing (yes, that includes your
-designers)? How do we decide what goes into a QML module? And how many of those
-modules should we have?&lt;/p&gt;
-&lt;p&gt;What I propose as a possible answer is a universal UI wireframe &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt; that has
-been frequently rediscovered. When followed everything else usually falls into
-place.&lt;/p&gt;
-&lt;p&gt;Its roots can be traced back to at least the early 80s. It's been shown to be
-useful to a wide range of (desktop) applications. Yet due to its
-ubiquitousness, users will find the look &amp;amp; feel familiar.&lt;/p&gt;
+to navigate for each team member, regardless of experience level? Something
+that can be intuitively understood by every contributor, including designers
+and product owners?&lt;/p&gt;
+&lt;p&gt;Also, how should we decide what goes into a QML module? And how many of those
+modules are needed?&lt;/p&gt;
+&lt;p&gt;What I propose as a possible answer to all of the above is a universal UI
+wireframe &lt;a class="footnote-reference" href="#footnote-1" id="footnote-reference-1"&gt;[1]&lt;/a&gt; that has often been rediscovered. When followed &amp;amp; applied
+correctly, everything else will fall into place.&lt;/p&gt;
+&lt;p&gt;Its roots can be traced back to at least the early 80s. It has proven to be
+useful to a wide range of (desktop) applications. Due to its ubiquitousness,
+users will find the look &amp;amp; feel familiar.&lt;/p&gt;
 &lt;p&gt;Here's how it looks, in its abstract form:&lt;/p&gt;
 &lt;img alt="The Cascading UI Wireframe" src="images/qml-hierarchies/cascading-wireframe.png"/&gt;
 &lt;/div&gt;
 &lt;div class="section" id="the-concept"&gt;
 &lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;The concept&lt;/a&gt;&lt;/h2&gt;
-&lt;p&gt;I'd like to call this &lt;em&gt;The Cascading UI Wireframe&lt;/em&gt;. Like a waterfall,
+&lt;p&gt;I'd like to call this &lt;em&gt;The Cascading UI Wireframe&lt;/em&gt;. Like steps in a waterfall,
 navigation flows left to right. Each pane's interactive state controls what's
 displayed to the right of it. Conversely, the larger the impact of an action on
 the UI, the further the user has to move to the left to initiate it.&lt;/p&gt;
@@ -110,6 +112,8 @@ requires us to be explicit about a component's dependencies. In general, this
 becomes simpler the smaller the components are, so there is a direct synergy
 with the first point. Thinking in terms of UI layers greatly helps us to decide
 when &amp;amp; where to split components.&lt;/p&gt;
+&lt;p&gt;Each layer maps to one QML module with a dedicated &lt;tt class="docutils literal"&gt;qmldir&lt;/tt&gt; file, so even
+with many small QML components, our project structure won't feel crowded.&lt;/p&gt;
 &lt;p&gt;In the following code listing, the import directive for &lt;tt class="docutils literal"&gt;Layer1&lt;/tt&gt; introduces a
 shortened namespace, &lt;tt class="docutils literal"&gt;L1&lt;/tt&gt;. Both components from that layer, &lt;tt class="docutils literal"&gt;AppMenu&lt;/tt&gt; and
 &lt;tt class="docutils literal"&gt;Canvas&lt;/tt&gt; that are used by &lt;tt class="docutils literal"&gt;Main&lt;/tt&gt; are prefixed accordingly:&lt;/p&gt;
